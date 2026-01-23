@@ -2,32 +2,27 @@
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up (queryInterface, Sequelize) {
-    await queryInterface.createTable('users', {
+  async up(queryInterface, Sequelize) {
+    await queryInterface.createTable('categories', {
       id: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-        allowNull: false
-      },
-      firstname: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      surname: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      email: {
-        type: Sequelize.STRING,
         allowNull: false,
-        unique: true
+        autoIncrement: true,
+        primaryKey: true,
+        type: Sequelize.INTEGER
       },
-      password: {
+      name: {
         type: Sequelize.STRING,
         allowNull: false
       },
-      // Padronizando snake_case para bater com o Model
+      slug: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      use_in_menu: {
+        type: Sequelize.BOOLEAN,
+        allowNull: true,
+        defaultValue: 0
+      },
       created_at: {
         allowNull: false,
         type: Sequelize.DATE,
@@ -41,7 +36,7 @@ module.exports = {
     });
   },
 
-  async down (queryInterface, Sequelize) {
-    await queryInterface.dropTable('users');
+  async down(queryInterface, Sequelize) {
+    await queryInterface.dropTable('categories');
   }
 };

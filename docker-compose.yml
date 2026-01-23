@@ -7,7 +7,7 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: senha-root
-      MYSQL_DATABASE: nome_do_banco
+      MYSQL_DATABASE: digital_store_db
       MYSQL_USER: usuario_app
       MYSQL_PASSWORD: senha_app
     ports:
