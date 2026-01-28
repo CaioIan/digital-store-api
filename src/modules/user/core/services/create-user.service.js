@@ -1,5 +1,5 @@
 const userRepository = require('../../persistence/user.repository');
-const CreateUserResponseDTO = require('../../http/dto/create-user.response.dto');
+const CreateUserResponseDTO = require('../../http/dto/response/create-user.response.dto');
 
 class CreateUserService {
   async execute({ firstname, surname, email, password, confirmPassword }) {
