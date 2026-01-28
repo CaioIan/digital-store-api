@@ -28,16 +28,10 @@ fs
     );
   })
   .forEach(file => {
-    // Importa a classe do Model
     const model = require(path.join(__dirname, file));
-    // Inicializa o model (passando a conexão sequelize e os DataTypes)
-    if (model.init) {
-        model.init(sequelize, Sequelize.DataTypes);
-    } else {
-        // Fallback caso use o padrão de função.
-        model(sequelize, Sequelize.DataTypes);
-    }
-    db[model.name] = model;
+    // Se for função (padrão recomendado), inicializa e adiciona pelo nome do model
+    const modelInstance = model(sequelize, Sequelize.DataTypes);
+    db[modelInstance.name] = modelInstance;
   });
 
 // Executa as associações (relacionamentos) se houver
