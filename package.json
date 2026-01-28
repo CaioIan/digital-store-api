@@ -26,6 +26,10 @@
     "express": "^5.2.1",
     "mysql2": "^3.16.1",
     "sequelize": "^6.37.7",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui": "^5.31.0",
+    "swagger-ui-express": "^5.0.1",
+    "uuid": "^13.0.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
