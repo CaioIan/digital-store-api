@@ -5,10 +5,11 @@ const loginController = require("../http/controllers/login.controller");
 const { createUserValidation } = require("../http/validators/create-user.validator");
 const { loginValidation } = require("../http/validators/login.validator");
 
+const authVerificationMiddleware = require("../../../shared/auth/auth-verification.middleware");
 const router = express.Router();
 
 router.post("/v1/user/login", loginValidation, loginController.handle);
 router.post("/v1/user", createUserValidation, createUserController.handle);
-router.get("/v1/user/:id", getUserByIdController.handle);
+router.get("/v1/user/:id", authVerificationMiddleware, getUserByIdController.handle);
 
 module.exports = router;
