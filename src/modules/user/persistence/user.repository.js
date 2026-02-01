@@ -11,6 +11,11 @@ class UserRepository {
     const user = await User.findByPk(userId);
     return user;
   }
+
+  async findByEmail(email) {
+    const user = await User.findOne({ where: { email } });
+    return user;
+  }
 }
 
 module.exports = new UserRepository();
