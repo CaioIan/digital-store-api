@@ -20,7 +20,8 @@ const createUserSchema = z
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
     path: ["confirmPassword"], // Aponta o erro especificamente para este campo
-  });
+  })
+  .strict();
 
 // Middleware para usar na rota
 const createUserValidator = (req, res, next) => {
