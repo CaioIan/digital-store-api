@@ -5,7 +5,7 @@ const loginSchema = z.object({
   password: z.string({ required_error: "Senha é obrigatória" }).min(1, "Senha é obrigatória"),
 });
 
-const loginValidation = (req, res, next) => {
+const loginValidator = (req, res, next) => {
   const result = loginSchema.safeParse(req.body);
   if (!result.success) {
     const errors = result.error.issues.map((err) => ({
@@ -17,4 +17,4 @@ const loginValidation = (req, res, next) => {
   next();
 };
 
-module.exports = { loginValidation };
+module.exports = { loginValidator };
