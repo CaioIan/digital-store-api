@@ -9,14 +9,8 @@ class UpdateUserService {
       if (!user) {
         throw new Error("Acesso negado ou recurso não disponível.");
       }
-      return new UpdateUserResponseDto({
-        id: user.id,
-        firstname: user.firstname,
-        surname: user.surname,
-        email: user.email,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      });
+      const response = UpdateUserResponseDto.parse({ user });
+      return response;
     }
 
     if (String(loggedUser.sub) === String(targetUserId)) {
@@ -24,14 +18,8 @@ class UpdateUserService {
       if (!user) {
         throw new Error("Acesso negado ou recurso não disponível.");
       }
-      return new UpdateUserResponseDto({
-        id: user.id,
-        firstname: user.firstname,
-        surname: user.surname,
-        email: user.email,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      });
+      const response = UpdateUserResponseDto.parse({ user });
+      return response;
     }
 
     throw new Error("Acesso negado ou recurso não disponível.");

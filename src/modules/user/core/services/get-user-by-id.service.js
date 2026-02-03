@@ -14,12 +14,8 @@ class GetUserByIdService {
       if (!user) {
         throw new Error("Acesso negado ou recurso não disponível.");
       }
-      return new GetUserByIdResponseDTO({
-        id: user.id,
-        firstname: user.firstname,
-        surname: user.surname,
-        email: user.email,
-      });
+      const response = GetUserByIdResponseDTO.parse({ user });
+      return response;
     }
 
     // User só pode buscar o próprio id
@@ -28,12 +24,8 @@ class GetUserByIdService {
       if (!user) {
         throw new Error("Acesso negado ou recurso não disponível.");
       }
-      return new GetUserByIdResponseDTO({
-        id: user.id,
-        firstname: user.firstname,
-        surname: user.surname,
-        email: user.email,
-      });
+      const response = GetUserByIdResponseDTO.parse({ user });
+      return response;
     }
 
     // Qualquer outro caso: acesso negado

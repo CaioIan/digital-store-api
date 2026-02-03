@@ -9,12 +9,8 @@ class CreateUserService {
     }
     // Não passe 'role' do body, será sempre USER no repository
     const user = await userRepository.create({ firstname, surname, email, password });
-    return new CreateUserResponseDTO({
-      id: user.id,
-      firstname: user.firstname,
-      surname: user.surname,
-      email: user.email,
-    });
+    const response = CreateUserResponseDTO.parse({ user });
+    return response;
   }
 }
 

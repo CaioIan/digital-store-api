@@ -1,11 +1,12 @@
-// DTO para response de obtenção de usuário por ID
-class GetUserByIdResponseDTO {
-  constructor({ id, firstname, surname, email }) {
-    this.id = id;
-    this.firstname = firstname;
-    this.surname = surname;
-    this.email = email;
-  }
-}
+const { z } = require("zod");
 
-module.exports = GetUserByIdResponseDTO;
+const GetUserByIdResponseDto = z.object({
+  user: z.object({
+    id: z.string().uuid(),
+    firstname: z.string(),
+    surname: z.string(),
+    email: z.string().email(),
+  }),
+});
+
+module.exports = GetUserByIdResponseDto;

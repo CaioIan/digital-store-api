@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 const userRepository = require("../../persistence/user.repository");
 const { generateToken } = require("../../../../shared/auth/jwt");
-const LoginResponseDTO = require("../../http/dto/response/login.response.dto");
+const LoginResponseDto = require("../../http/dto/response/login.response.dto");
 
 class LoginService {
   async execute({ email, password }) {
@@ -17,15 +17,8 @@ class LoginService {
     }
     // Gerar token JWT
     const token = generateToken({ sub: user.id, role: user.role });
-    return new LoginResponseDTO({
-      token,
-      user: {
-        id: user.id,
-        firstname: user.firstname,
-        surname: user.surname,
-        email: user.email,
-      },
-    });
+    const response = LoginResponseDto.parse({ token, user });
+    return response;
   }
 }
 

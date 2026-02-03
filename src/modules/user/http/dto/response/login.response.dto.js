@@ -1,13 +1,13 @@
-class LoginResponseDTO {
-  constructor({ token, user }) {
-    this.token = token;
-    this.user = {
-      id: user.id,
-      firstname: user.firstname,
-      surname: user.surname,
-      email: user.email,
-    };
-  }
-}
+const { z } = require("zod");
 
-module.exports = LoginResponseDTO;
+const LoginResponseDto = z.object({
+  token: z.string(),
+  user: z.object({
+    id: z.string().uuid(),
+    firstname: z.string(),
+    surname: z.string(),
+    email: z.string().email(),
+  }),
+});
+
+module.exports = LoginResponseDto;

@@ -1,11 +1,12 @@
-// DTO para response de criação de usuário
-class CreateUserResponseDTO {
-  constructor({ id, firstname, surname, email }) {
-    this.id = id;
-    this.firstname = firstname;
-    this.surname = surname;
-    this.email = email;
-  }
-}
+const { z } = require("zod");
 
-module.exports = CreateUserResponseDTO;
+const CreateUserResponseDto = z.object({
+  user: z.object({
+    id: z.string().uuid(),
+    firstname: z.string(),
+    surname: z.string(),
+    email: z.string().email(),
+  }),
+});
+
+module.exports = CreateUserResponseDto;
