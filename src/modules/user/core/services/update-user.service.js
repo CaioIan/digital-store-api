@@ -3,14 +3,10 @@ const UpdateUserResponseDto = require("../../http/dto/response/update-user.respo
 
 class UpdateUserService {
   async execute(targetUserId, loggedUser, updateData) {
-    console.log("[UpdateUserService] targetUserId:", targetUserId);
-    console.log("[UpdateUserService] loggedUser:", loggedUser);
-    console.log("[UpdateUserService] updateData:", updateData);
     // Admin pode atualizar qualquer usuário
     if (loggedUser.role === "ADMIN") {
       const user = await userRepository.updateUser(targetUserId, updateData);
       if (!user) {
-        console.log("[UpdateUserService] Usuário não encontrado ou não atualizado (ADMIN)");
         throw new Error("Acesso negado ou recurso não disponível.");
       }
       return new UpdateUserResponseDto({
@@ -26,7 +22,6 @@ class UpdateUserService {
     if (String(loggedUser.sub) === String(targetUserId)) {
       const user = await userRepository.updateUser(targetUserId, updateData);
       if (!user) {
-        console.log("[UpdateUserService] Usuário não encontrado ou não atualizado (SELF)");
         throw new Error("Acesso negado ou recurso não disponível.");
       }
       return new UpdateUserResponseDto({
@@ -39,7 +34,6 @@ class UpdateUserService {
       });
     }
 
-    console.log("[UpdateUserService] Falha de permissão: sub != id e não é ADMIN");
     throw new Error("Acesso negado ou recurso não disponível.");
   }
 }
