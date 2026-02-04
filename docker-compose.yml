@@ -15,5 +15,20 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
 
+  db_test:
+    image: mysql:8.0
+    container_name: digital-store-db-test
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: senha-root
+      MYSQL_DATABASE: digital_store_db_test
+      MYSQL_USER: usuario_app
+      MYSQL_PASSWORD: senha_app
+    ports:
+      - "3307:3307"
+    volumes:
+      - mysql_data_test:/var/lib/mysql
+
 volumes:
   mysql_data:
+  mysql_data_test:
