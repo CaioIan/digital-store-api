@@ -13,6 +13,34 @@ class CategoryRepository {
       },
     });
   }
+
+  async searchCategories({ limit, page, fields, use_in_menu } = {}) {
+    // Construção dinâmica do WHERE e ATTRIBUTES de forma mais limpa
+    const queryOptions = {
+      where: use_in_menu === true ? { use_in_menu: 1 } : {},
+      raw: true,
+      nest: true,
+    };
+
+    // Lógica de Projeção (Garante ID)
+    if (fields?.length) {
+      queryOptions.attributes = fields.includes("id") ? fields : ["id", ...fields];
+    }
+
+    // Normalização defensiva (mesmo com validator, protege o repositório)
+    const safeLimit = parseInt(limit, 10) || 12;
+    const safePage = parseInt(page, 10) || 1;
+
+    // Lógica de Paginação
+    if (safeLimit !== -1) {
+      queryOptions.limit = safeLimit;
+      queryOptions.offset = (Math.max(safePage, 1) - 1) * safeLimit;
+    }
+
+    const { count, rows } = await Category.findAndCountAll(queryOptions);
+
+    return { data: rows, total: count };
+  }
 }
 
 module.exports = new CategoryRepository();
