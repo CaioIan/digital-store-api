@@ -17,7 +17,7 @@ class CategoryRepository {
   async searchCategories({ limit, page, fields, use_in_menu } = {}) {
     // Construção dinâmica do WHERE e ATTRIBUTES de forma mais limpa
     const queryOptions = {
-      where: use_in_menu !== undefined ? { use_in_menu } : {},
+      where: use_in_menu === true ? { use_in_menu: 1 } : {},
       raw: true,
       nest: true,
     };

@@ -27,7 +27,7 @@ const searchCategorySchema = z.object({
   use_in_menu: z
     .enum(["true"])
     .optional()
-    .transform((val) => val === "true"),
+    .transform((val) => (val === "true" ? true : undefined)),
 });
 
 const searchCategoryValidator = (req, res, next) => {
