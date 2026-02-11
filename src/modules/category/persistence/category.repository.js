@@ -14,6 +14,11 @@ class CategoryRepository {
     });
   }
 
+  async findById(id) {
+    const category = await Category.findByPk(id);
+    return category;
+  }
+
   async searchCategories({ limit, page, fields, use_in_menu } = {}) {
     // Construção dinâmica do WHERE e ATTRIBUTES de forma mais limpa
     const queryOptions = {
