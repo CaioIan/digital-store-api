@@ -1,5 +1,5 @@
 const UpdateUserService = require("../../core/services/update-user.service");
-
+const UpdateUserResponseDto = require("../dto/response/update-user.response.dto")
 /**
  * @swagger
  * /v1/user/{id}:
@@ -74,7 +74,7 @@ class UpdateUserController {
 
     try {
       const User = await UpdateUserService.execute(targetUserId, loggedUser, req.body);
-      return res.status(200).json(User);
+      return res.status(200).json(UpdateUserResponseDto.toResponse(User));
     } catch (error) {
       return res.status(400).json({ error: error.message });
     }

@@ -30,13 +30,11 @@ describe("GetCategoryByIdService - Unit Tests", () => {
       expect(result.name).toBe("Eletrônicos");
     });
 
-    it("deve retornar null quando a categoria não existe", async () => {
+    it("deve lançar erro quando a categoria não existe", async () => {
       categoryRepository.findById.mockResolvedValue(null);
 
-      const result = await getCategoryByIdService.execute("non-existent-id");
-
+      await expect(getCategoryByIdService.execute("non-existent-id")).rejects.toThrow("Category not found.");
       expect(categoryRepository.findById).toHaveBeenCalledWith("non-existent-id");
-      expect(result).toBeNull();
     });
 
     it("deve propagar erro quando o repository falha", async () => {

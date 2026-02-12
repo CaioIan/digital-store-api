@@ -44,8 +44,8 @@ describe("UpdateUserService - Unit Tests", () => {
       const result = await updateUserService.execute(mockUser.id, adminUser, updateData);
 
       expect(userRepository.updateUser).toHaveBeenCalledWith(mockUser.id, updateData);
-      expect(result).toHaveProperty("user");
-      expect(result.user.firstname).toBe(updateData.firstname);
+      expect(result).toHaveProperty("firstname");
+      expect(result.firstname).toBe(updateData.firstname);
     });
 
     it("deve atualizar usuário quando USER atualiza próprio perfil", async () => {
@@ -55,8 +55,8 @@ describe("UpdateUserService - Unit Tests", () => {
       const result = await updateUserService.execute(mockUser.id, regularUser, updateData);
 
       expect(userRepository.updateUser).toHaveBeenCalledWith(mockUser.id, updateData);
-      expect(result).toHaveProperty("user");
-      expect(result.user.firstname).toBe(updateData.firstname);
+      expect(result).toHaveProperty("firstname");
+      expect(result.firstname).toBe(updateData.firstname);
     });
 
     it("deve lançar erro quando USER tenta atualizar outro usuário", async () => {

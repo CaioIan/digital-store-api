@@ -41,8 +41,32 @@ describe("CreateUserService - Unit Tests", () => {
         email: validUserData.email,
         password: validUserData.password,
       });
-      expect(result).toHaveProperty("user");
-      expect(result.user.email).toBe(validUserData.email);
+      expect(result).toHaveProperty("email");
+      expect(result.email).toBe(validUserData.email);
+    });
+    it("deve criar um usuário com sucesso quando os dados são válidos", async () => {
+      const mockUser = {
+        id: "123e4567-e89b-12d3-a456-426614174000",
+        firstname: "John",
+        surname: "Doe",
+        email: "john.doe@example.com",
+        role: "USER",
+      };
+
+      userRepository.findByEmail.mockResolvedValue(null);
+      userRepository.create.mockResolvedValue(mockUser);
+
+      const result = await createUserService.execute(validUserData);
+
+      expect(userRepository.findByEmail).toHaveBeenCalledWith(validUserData.email);
+      expect(userRepository.create).toHaveBeenCalledWith({
+        firstname: validUserData.firstname,
+        surname: validUserData.surname,
+        email: validUserData.email,
+        password: validUserData.password,
+      });
+      expect(result).toHaveProperty("email");
+      expect(result.email).toBe(validUserData.email);
     });
 
     it("deve lançar erro quando as senhas não coincidem", async () => {

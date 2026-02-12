@@ -1,6 +1,6 @@
 const { z } = require("zod");
 
-const LoginResponseDto = z.object({
+const loginResponseSchema = z.object({
   token: z.string(),
   user: z.object({
     id: z.string().uuid(),
@@ -9,5 +9,11 @@ const LoginResponseDto = z.object({
     email: z.string().email(),
   }),
 });
+
+const LoginResponseDto = {
+  toResponse(payload) {
+    return loginResponseSchema.parse(payload);
+  },
+};
 
 module.exports = LoginResponseDto;

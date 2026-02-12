@@ -42,6 +42,7 @@
  *         description: Token não fornecido ou inválido
  */
 const GetUserByIdService = require("../../core/services/get-user-by-id.service");
+const GetUserByIdResponseDto = require("../dto/response/get-user-by-id.response.dto");
 
 class GetUserByIdController {
   async handle(req, res) {
@@ -49,7 +50,7 @@ class GetUserByIdController {
       const targetUserId = req.params.id;
       const loggedUser = req.user; // payload do token
       const user = await GetUserByIdService.execute({ targetUserId, loggedUser });
-      return res.status(200).json(user);
+      return res.status(200).json(GetUserByIdResponseDto.toResponse(user));
     } catch (error) {
       return res.status(400).json({ error: error.message });
     }

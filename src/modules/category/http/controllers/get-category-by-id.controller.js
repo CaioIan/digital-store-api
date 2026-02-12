@@ -50,17 +50,11 @@ class GetCategoryByIdController {
     try {
       const targetCategoryId = req.params.id;
       const category = await GetCategoryByIdService.execute(targetCategoryId);
-
-      if (!category) {
+      return res.status(200).json(GetCategoryByIdResponseDto.toResponse(category));
+    } catch (error) {
+      if (error.message === "Category not found.") {
         return res.status(404).json({ error: "Category not found" });
       }
-
-      const responseBody = GetCategoryByIdResponseDto.parse(
-        typeof category.toJSON === "function" ? category.toJSON() : category,
-      );
-
-      return res.status(200).json(responseBody);
-    } catch (error) {
       return res.status(400).json({ error: error.message });
     }
   }

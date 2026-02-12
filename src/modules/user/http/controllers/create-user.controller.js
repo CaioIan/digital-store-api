@@ -1,5 +1,5 @@
 const CreateUserService = require("../../core/services/create-user.service");
-
+const CreateUserResponseDto = require("../dto/response/create-user.response.dto")
 /**
  * @swagger
  * /v1/user:
@@ -86,7 +86,7 @@ class CreateUserController {
   async handle(req, res) {
     try {
       const user = await CreateUserService.execute(req.body);
-      return res.status(201).json(user);
+      return res.status(201).json(CreateUserResponseDto.toResponse(user));
     } catch (error) {
       return res.status(400).json({ error: error.message });
     }

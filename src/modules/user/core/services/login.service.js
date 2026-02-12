@@ -17,8 +17,16 @@ class LoginService {
     }
     // Gerar token JWT
     const token = generateToken({ sub: user.id, role: user.role });
-    const response = LoginResponseDto.parse({ token, user });
-    return response;
+    
+     return {
+      token,
+      user: {
+        id: user.id,
+        firstname: user.firstname,
+        surname: user.surname,
+        email: user.email,
+      },
+    };
   }
 }
 

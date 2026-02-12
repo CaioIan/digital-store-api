@@ -1,3 +1,4 @@
+const LoginResponseDto = require("../dto/response/login.response.dto")
 /**
  * @swagger
  * /v1/user/login:
@@ -53,10 +54,12 @@ const LoginService = require("../../core/services/login.service");
 
 class LoginController {
   async handle(req, res) {
-    const { email, password } = req.body;
     try {
-      const { token, user } = await LoginService.execute({ email, password });
-      return res.status(200).json({ token, user });
+      const { email, password } = req.body;
+
+      const result = await LoginService.execute({ email, password });
+      return res.status(200).json(LoginResponseDto.toResponse(result));
+      
     } catch (error) {
       return res.status(400).json({ error: error.message });
     }

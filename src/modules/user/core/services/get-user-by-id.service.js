@@ -1,5 +1,4 @@
 const userRepository = require("../../persistence/user.repository");
-const GetUserByIdResponseDTO = require("../../http/dto/response/get-user-by-id.response.dto");
 
 class GetUserByIdService {
   /**
@@ -14,8 +13,7 @@ class GetUserByIdService {
       if (!user) {
         throw new Error("Acesso negado ou recurso não disponível.");
       }
-      const response = GetUserByIdResponseDTO.parse({ user });
-      return response;
+      return user;
     }
 
     // User só pode buscar o próprio id
@@ -24,8 +22,7 @@ class GetUserByIdService {
       if (!user) {
         throw new Error("Acesso negado ou recurso não disponível.");
       }
-      const response = GetUserByIdResponseDTO.parse({ user });
-      return response;
+      return user;
     }
 
     // Qualquer outro caso: acesso negado

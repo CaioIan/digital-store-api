@@ -39,8 +39,8 @@ describe("GetUserByIdService - Unit Tests", () => {
       });
 
       expect(userRepository.findById).toHaveBeenCalledWith(mockUser.id);
-      expect(result).toHaveProperty("user");
-      expect(result.user.id).toBe(mockUser.id);
+      expect(result).toHaveProperty("id");
+      expect(result.id).toBe(mockUser.id);
     });
 
     it("deve retornar usuário quando USER busca o próprio ID", async () => {
@@ -52,8 +52,8 @@ describe("GetUserByIdService - Unit Tests", () => {
       });
 
       expect(userRepository.findById).toHaveBeenCalledWith(mockUser.id);
-      expect(result).toHaveProperty("user");
-      expect(result.user.id).toBe(mockUser.id);
+      expect(result).toHaveProperty("id");
+      expect(result.id).toBe(mockUser.id);
     });
 
     it("deve lançar erro quando USER tenta buscar outro usuário", async () => {

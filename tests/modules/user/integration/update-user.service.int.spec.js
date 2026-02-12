@@ -26,10 +26,10 @@ describe("UpdateUserService - Integration Tests", () => {
       const updateData = { firstname: "Updated", surname: "Name" };
       const loggedUser = { sub: admin.id, role: "ADMIN" };
 
-      const result = await updateUserService.execute(user.id, loggedUser, updateData);
 
-      expect(result.user.firstname).toBe("Updated");
-      expect(result.user.surname).toBe("Name");
+      const result = await updateUserService.execute(user.id, loggedUser, updateData);
+      expect(result.firstname).toBe("Updated");
+      expect(result.surname).toBe("Name");
 
       // Verifica no banco
       const updatedUser = await User.findByPk(user.id);
@@ -43,10 +43,10 @@ describe("UpdateUserService - Integration Tests", () => {
       const updateData = { firstname: "NewFirstname", surname: "NewSurname" };
       const loggedUser = { sub: user.id, role: "USER" };
 
-      const result = await updateUserService.execute(user.id, loggedUser, updateData);
 
-      expect(result.user.firstname).toBe("NewFirstname");
-      expect(result.user.surname).toBe("NewSurname");
+      const result = await updateUserService.execute(user.id, loggedUser, updateData);
+      expect(result.firstname).toBe("NewFirstname");
+      expect(result.surname).toBe("NewSurname");
 
       // Verifica no banco
       const updatedUser = await User.findByPk(user.id);

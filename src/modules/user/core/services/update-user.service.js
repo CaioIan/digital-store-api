@@ -1,5 +1,4 @@
 const userRepository = require("../../persistence/user.repository");
-const UpdateUserResponseDto = require("../../http/dto/response/update-user.response.dto");
 
 class UpdateUserService {
   async execute(targetUserId, loggedUser, updateData) {
@@ -9,8 +8,7 @@ class UpdateUserService {
       if (!user) {
         throw new Error("Acesso negado ou recurso não disponível.");
       }
-      const response = UpdateUserResponseDto.parse({ user });
-      return response;
+      return user;
     }
 
     if (String(loggedUser.sub) === String(targetUserId)) {
@@ -18,8 +16,7 @@ class UpdateUserService {
       if (!user) {
         throw new Error("Acesso negado ou recurso não disponível.");
       }
-      const response = UpdateUserResponseDto.parse({ user });
-      return response;
+      return user;
     }
 
     throw new Error("Acesso negado ou recurso não disponível.");
