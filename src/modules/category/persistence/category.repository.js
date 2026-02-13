@@ -52,6 +52,13 @@ class CategoryRepository {
     if (!updated) return null;
     return await this.findById(id);
   }
+
+  async softDelete(id) {
+    const category = await this.findById(id);
+    if (!category) return null;
+    await Category.destroy({ where: { id } });
+    return category;
+  }
 }
 
 module.exports = new CategoryRepository();

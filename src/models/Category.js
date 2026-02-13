@@ -33,6 +33,7 @@ module.exports = (sequelize, DataTypes) => {
       tableName: "categories",
       timestamps: true,
       underscored: true,
+      paranoid: true,
     },
   );
 
