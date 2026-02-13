@@ -46,6 +46,12 @@ class CategoryRepository {
 
     return { data: rows, total: count };
   }
+
+  async update(id, data) {
+    const [updated] = await Category.update(data, { where: { id } });
+    if (!updated) return null;
+    return await this.findById(id);
+  }
 }
 
 module.exports = new CategoryRepository();

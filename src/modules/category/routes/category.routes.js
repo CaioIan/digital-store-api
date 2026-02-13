@@ -8,6 +8,8 @@ const SearchCategoryController = require("../http/controllers/search-category.co
 const { searchCategoryValidator } = require("../http/validators/search-category.validator");
 const GetCategoryByIdController = require("../http/controllers/get-category-by-id.controller");
 const { getCategoryByIdValidator } = require("../http/validators/get-category-by-id.validator");
+const updateCategoryController = require("../http/controllers/update-category.controller");
+const { updateCategoryValidator } = require("../http/validators/update-category.validator");
 const router = express.Router();
 
 router.post(
@@ -17,6 +19,8 @@ router.post(
   createCategoryValidator,
   CreateCategoryController.handle,
 );
+
+router.patch("/v1/category/:id", authVerificationMiddleware, roleGuardMiddleware.handle(["ADMIN"]), updateCategoryValidator, updateCategoryController.handle)
 
 router.get("/v1/category/search", authVerificationMiddleware, searchCategoryValidator, SearchCategoryController.handle);
 router.get("/v1/category/:id", authVerificationMiddleware, getCategoryByIdValidator, GetCategoryByIdController.handle);
