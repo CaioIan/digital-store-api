@@ -1,7 +1,18 @@
 const { Model, DataTypes } = require("sequelize");
 
 module.exports = (sequelize) => {
-  class ProductOption extends Model {}
+  class ProductOption extends Model {
+    static associate(models) {
+      ProductOption.belongsTo(models.Product, {
+        foreignKey: "product_id",
+        as: "product",
+      });
+      ProductOption.belongsTo(models.Category, {
+        foreignKey: "category_id",
+        as: "category",
+      });
+    }
+  }
 
   ProductOption.init(
     {
@@ -22,8 +33,8 @@ module.exports = (sequelize) => {
         onDelete: "CASCADE",
       },
       category_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
+        type: DataTypes.UUID,
+        allowNull: true,
         references: {
           model: "Categories",
           key: "id",
