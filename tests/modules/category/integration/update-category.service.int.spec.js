@@ -22,7 +22,10 @@ describe("Update Category - Integration Tests", () => {
   });
 
   afterEach(async () => {
-    await Category.destroy({ where: {}, truncate: true });
+    // Desabilita FK checks para permitir truncate mesmo com associações
+    await sequelize.query("SET FOREIGN_KEY_CHECKS = 0", { raw: true });
+    await Category.destroy({ where: {}, truncate: true, force: true });
+    await sequelize.query("SET FOREIGN_KEY_CHECKS = 1", { raw: true });
   });
 
   afterAll(async () => {

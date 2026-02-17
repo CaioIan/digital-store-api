@@ -27,7 +27,9 @@ describe("Create Category - Integration Tests", () => {
 
   afterEach(async () => {
     // Limpa a tabela após cada teste mantendo a estrutura
-    await Category.destroy({ where: {}, truncate: true });
+    await sequelize.query("SET FOREIGN_KEY_CHECKS = 0", { raw: true });
+    await Category.destroy({ where: {}, truncate: true, force: true });
+    await sequelize.query("SET FOREIGN_KEY_CHECKS = 1", { raw: true });
   });
 
   // Fecha a conexão após todos os testes para liberar o processo

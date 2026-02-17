@@ -22,7 +22,9 @@ describe("Delete Category - Integration Tests", () => {
   });
 
   afterEach(async () => {
+    await sequelize.query("SET FOREIGN_KEY_CHECKS = 0", { raw: true });
     await Category.destroy({ where: {}, force: true, truncate: true });
+    await sequelize.query("SET FOREIGN_KEY_CHECKS = 1", { raw: true });
   });
 
   afterAll(async () => {
