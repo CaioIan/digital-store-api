@@ -1,6 +1,6 @@
 const { z } = require("zod");
 
-const listProductsSchema = z.object({
+const searchProductSchema = z.object({
   limit: z.coerce
     .number()
     .int()
@@ -46,8 +46,8 @@ const listProductsSchema = z.object({
   option: z.record(z.string()).optional(),
 });
 
-const listProductsValidator = (req, res, next) => {
-  const result = listProductsSchema.safeParse(req.query);
+const searchProductValidator = (req, res, next) => {
+  const result = searchProductSchema.safeParse(req.query);
 
   if (!result.success) {
     const errors = result.error.issues.map((err) => ({
@@ -61,4 +61,4 @@ const listProductsValidator = (req, res, next) => {
   next();
 };
 
-module.exports = { listProductsValidator };
+module.exports = { searchProductValidator };

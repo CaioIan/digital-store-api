@@ -60,7 +60,7 @@ class ProductRepository {
       throw error;
     }
   }
-  async listProducts({ limit, page, fields, match, category_ids, priceRange, option } = {}) {
+  async searchProducts({ limit, page, fields, match, category_ids, priceRange, option } = {}) {
     const queryOptions = {
       where: {},
       include: [],

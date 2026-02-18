@@ -1,10 +1,10 @@
-const listProductsService = require("../../../../src/modules/product/core/services/list-products.service");
+const searchProductService = require("../../../../src/modules/product/core/services/search-product.service");
 const productRepository = require("../../../../src/modules/product/persistence/product.repository");
 
 // Mock do repository
 jest.mock("../../../../src/modules/product/persistence/product.repository");
 
-describe("ListProductsService - Unit Tests", () => {
+describe("SearchProductService - Unit Tests", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -28,11 +28,11 @@ describe("ListProductsService - Unit Tests", () => {
         page: 2,
       };
 
-      productRepository.listProducts.mockResolvedValue(mockResponse);
+      productRepository.searchProducts.mockResolvedValue(mockResponse);
 
-      const result = await listProductsService.execute(params);
+      const result = await searchProductService.execute(params);
 
-      expect(productRepository.listProducts).toHaveBeenCalledWith(params);
+      expect(productRepository.searchProducts).toHaveBeenCalledWith(params);
       expect(result).toEqual(mockResponse);
     });
 
@@ -44,11 +44,11 @@ describe("ListProductsService - Unit Tests", () => {
         page: 1,
       };
 
-      productRepository.listProducts.mockResolvedValue(mockResponse);
+      productRepository.searchProducts.mockResolvedValue(mockResponse);
 
-      const result = await listProductsService.execute({});
+      const result = await searchProductService.execute({});
 
-      expect(productRepository.listProducts).toHaveBeenCalledWith({});
+      expect(productRepository.searchProducts).toHaveBeenCalledWith({});
       expect(result).toEqual(mockResponse);
     });
 
@@ -64,11 +64,11 @@ describe("ListProductsService - Unit Tests", () => {
         page: 1,
       };
 
-      productRepository.listProducts.mockResolvedValue(mockResponse);
+      productRepository.searchProducts.mockResolvedValue(mockResponse);
 
-      const result = await listProductsService.execute(params);
+      const result = await searchProductService.execute(params);
 
-      expect(productRepository.listProducts).toHaveBeenCalledWith(params);
+      expect(productRepository.searchProducts).toHaveBeenCalledWith(params);
       expect(result).toEqual(mockResponse);
     });
   });

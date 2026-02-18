@@ -1,9 +1,9 @@
 const ProductRepository = require("../../persistence/product.repository");
 
-class ListProductsService {
+class SearchProductService {
   async execute(params) {
-    return await ProductRepository.listProducts(params);
+    return await ProductRepository.searchProducts(params);
   }
 }
 
-module.exports = new ListProductsService();
+module.exports = new SearchProductService();

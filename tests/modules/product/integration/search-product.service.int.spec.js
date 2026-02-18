@@ -99,10 +99,10 @@ describe("List Products - Integration Tests", () => {
     return { cat1, cat2, p1, p2, p3 };
   };
 
-  it("GET /v1/product/list-products - Deve retornar lista paginada padrão (12 itens)", async () => {
+  it("GET /v1/product/search - Deve retornar lista paginada padrão (12 itens)", async () => {
     await createScenario();
 
-    const response = await request(app).get("/v1/product/list-products");
+    const response = await request(app).get("/v1/product/search");
 
     expect(response.status).toBe(200);
     expect(response.body.data).toHaveLength(12);
@@ -111,10 +111,10 @@ describe("List Products - Integration Tests", () => {
     expect(response.body.limit).toBe(12);
   });
 
-  it("GET /v1/product/list-products - Deve respeitar paginação", async () => {
+  it("GET /v1/product/search - Deve respeitar paginação", async () => {
     await createScenario();
 
-    const response = await request(app).get("/v1/product/list-products?page=2&limit=5");
+    const response = await request(app).get("/v1/product/search?page=2&limit=5");
 
     expect(response.status).toBe(200);
     expect(response.body.data).toHaveLength(5);
@@ -122,30 +122,30 @@ describe("List Products - Integration Tests", () => {
     expect(response.body.limit).toBe(5);
   });
 
-  it("GET /v1/product/list-products - Deve retornar todos se limit for -1", async () => {
+  it("GET /v1/product/search - Deve retornar todos se limit for -1", async () => {
     await createScenario();
 
-    const response = await request(app).get("/v1/product/list-products?limit=-1");
+    const response = await request(app).get("/v1/product/search?limit=-1");
 
     expect(response.status).toBe(200);
     expect(response.body.data).toHaveLength(13);
     expect(response.body.limit).toBe(-1);
   });
 
-  it("GET /v1/product/list-products - Deve filtrar por match (nome)", async () => {
+  it("GET /v1/product/search - Deve filtrar por match (nome)", async () => {
     await createScenario();
 
-    const response = await request(app).get("/v1/product/list-products?match=Nike");
+    const response = await request(app).get("/v1/product/search?match=Nike");
 
     expect(response.status).toBe(200);
     expect(response.body.data).toHaveLength(1);
     expect(response.body.data[0].name).toBe("Tênis Nike");
   });
 
-  it("GET /v1/product/list-products - Deve filtrar por categorias", async () => {
+  it("GET /v1/product/search - Deve filtrar por categorias", async () => {
     const { cat1 } = await createScenario(); // cat1 = Sapato (tem 2 produtos: Nike e Adidas)
 
-    const response = await request(app).get(`/v1/product/list-products?category_ids=${cat1.id}`);
+    const response = await request(app).get(`/v1/product/search?category_ids=${cat1.id}`);
 
     expect(response.status).toBe(200);
     // Nike e Adidas
@@ -156,19 +156,19 @@ describe("List Products - Integration Tests", () => {
     });
   });
 
-  it("GET /v1/product/list-products - Deve filtrar por range de preço", async () => {
+  it("GET /v1/product/search - Deve filtrar por range de preço", async () => {
     await createScenario();
 
     // Produtos: 100 (Polo), 200 (Nike), 300 (Adidas), e genericos 50-60
     // Range 150-250 deve pegar só o Nike (200)
-    const response = await request(app).get("/v1/product/list-products?price-range=150-250");
+    const response = await request(app).get("/v1/product/search?price-range=150-250");
 
     expect(response.status).toBe(200);
     expect(response.body.data).toHaveLength(1);
     expect(response.body.data[0].price).toBe(200);
   });
 
-  it("GET /v1/product/list-products - Deve filtrar por opção específica", async () => {
+  it("GET /v1/product/search - Deve filtrar por opção específica", async () => {
     const { p1 } = await createScenario(); 
     // p1 tem option "Tamanho" com values ["40", "41"]
     
@@ -176,26 +176,26 @@ describe("List Products - Integration Tests", () => {
     const option = await ProductOption.findOne({ where: { product_id: p1.id } });
     
     // Busca por option[id]=40
-    const response = await request(app).get(`/v1/product/list-products?option[${option.id}]=40`);
+    const response = await request(app).get(`/v1/product/search?option[${option.id}]=40`);
 
     try {
         expect(response.status).toBe(200);
         expect(response.body.data).toHaveLength(1);
         expect(response.body.data[0].id).toBe(p1.id);
     } catch (e) {
-        require('fs').writeFileSync('failure.log', JSON.stringify({
+        /* require('fs').writeFileSync('failure.log', JSON.stringify({
             status: response.status,
             body: response.body,
-            queryURL: `/v1/product/list-products?option[${option.id}]=40`
-        }, null, 2));
+            queryURL: `/v1/product/search?option[${option.id}]=40`
+        }, null, 2)); */
         throw e;
     }
   });
 
-  it("GET /v1/product/list-products - Deve projetar campos (fields)", async () => {
+  it("GET /v1/product/search - Deve projetar campos (fields)", async () => {
     await createScenario();
 
-    const response = await request(app).get("/v1/product/list-products?fields=name,slug");
+    const response = await request(app).get("/v1/product/search?fields=name,slug");
 
     expect(response.status).toBe(200);
     const product = response.body.data[0];
@@ -205,24 +205,24 @@ describe("List Products - Integration Tests", () => {
     expect(product.price).toBeUndefined(); // Não pediu price
   });
 
-  it("GET /v1/product/list-products - Deve retornar 400 para limit inválido", async () => {
-    const response = await request(app).get("/v1/product/list-products?limit=-5");
+  it("GET /v1/product/search - Deve retornar 400 para limit inválido", async () => {
+    const response = await request(app).get("/v1/product/search?limit=-5");
 
     expect(response.status).toBe(400);
     expect(response.body.errors[0].message).toMatch(/limit must be positive/i);
   });
 
-  it("GET /v1/product/list-products - Deve retornar 400 para price-range inválido", async () => {
-      const response = await request(app).get("/v1/product/list-products?price-range=abc");
+  it("GET /v1/product/search - Deve retornar 400 para price-range inválido", async () => {
+      const response = await request(app).get("/v1/product/search?price-range=abc");
 
       expect(response.status).toBe(400);
       expect(response.body.errors[0].message).toMatch(/price range must be in format/i);
   });
 
-  it("GET /v1/product/list-products - Deve sanitizar input evitando SQL Injection (básico)", async () => {
+  it("GET /v1/product/search - Deve sanitizar input evitando SQL Injection (básico)", async () => {
       await createScenario();
       // Tenta passar um comando SQL no match
-      const response = await request(app).get("/v1/product/list-products?match=' OR '1'='1");
+      const response = await request(app).get("/v1/product/search?match=' OR '1'='1");
 
       // Se funcionar a injection, retornaria tudo porque '1'='1' (13 itens)
       // Se estiver seguro, vai procurar um produto com esse nome literal e retornar 0

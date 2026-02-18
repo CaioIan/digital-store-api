@@ -44,14 +44,14 @@ const productItemSchema = z
   })
   .partial();
 
-const listProductsResponseSchema = z.object({
+const searchProductResponseSchema = z.object({
   data: z.array(productItemSchema),
   total: z.coerce.number().int().default(0),
   limit: z.coerce.number().int().default(12),
   page: z.coerce.number().int().min(1).default(1),
 });
 
-const listProductsResponseDto = {
+const searchProductResponseDto = {
   toResponse(payload) {
     const safePayload = {
       data: payload.data?.map((item) => (typeof item.toJSON === "function" ? item.toJSON() : item)) || [],
@@ -60,8 +60,8 @@ const listProductsResponseDto = {
       page: payload.page,
     };
 
-    return listProductsResponseSchema.parse(safePayload);
+    return searchProductResponseSchema.parse(safePayload);
   },
 };
 
-module.exports = listProductsResponseDto;
+module.exports = searchProductResponseDto;

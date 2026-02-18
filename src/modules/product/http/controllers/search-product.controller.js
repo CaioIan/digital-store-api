@@ -1,7 +1,7 @@
-const ListProductsService = require("../../core/services/list-products.service");
-const ListProductsResponseDto = require("../dto/response/list-products.response.dto");
+const SearchProductService = require("../../core/services/search-product.service");
+const SearchProductResponseDto = require("../dto/response/search-product.response.dto");
 
-class ListProductsController {
+class SearchProductController {
   async handle(req, res) {
     try {
       const { 
@@ -14,7 +14,7 @@ class ListProductsController {
         option 
       } = req.query;
 
-      const result = await ListProductsService.execute({
+      const result = await SearchProductService.execute({
         page,
         limit,
         fields,
@@ -24,11 +24,11 @@ class ListProductsController {
         option,
       });
 
-      return res.status(200).json(ListProductsResponseDto.toResponse(result));
+      return res.status(200).json(SearchProductResponseDto.toResponse(result));
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }
   }
 }
 
-module.exports = new ListProductsController();
+module.exports = new SearchProductController();
