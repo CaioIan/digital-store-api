@@ -189,6 +189,68 @@ class ProductRepository {
 
     return product;
   }
+
+  async updateProduct(targetProductId, body) {
+    const transaction = await sequelize.transaction();
+    try {
+      // 1. Atualiza dados básicos do produto
+      await Product.update(body, {
+        where: { id: targetProductId },
+        transaction,
+      });
+
+      const product = await Product.findByPk(targetProductId, { transaction });
+
+      // 2. Atualiza Imagens (Se fornecido, substitui todas)
+      if (body.images) {
+        await ProductImage.destroy({ where: { product_id: targetProductId }, transaction });
+        
+        if (body.images.length > 0) {
+          const imageRecords = [];
+          for (const image of body.images) {
+             const path = await processImage(image.content, image.type);
+             imageRecords.push({
+               product_id: targetProductId,
+               enabled: true,
+               path,
+             });
+          }
+          await ProductImage.bulkCreate(imageRecords, { transaction });
+        }
+      }
+
+      // 3. Atualiza Opções (Se fornecido, substitui todas)
+      if (body.options) {
+        await ProductOption.destroy({ where: { product_id: targetProductId }, transaction });
+
+        if (body.options.length > 0) {
+          const optionRecords = body.options.map((option) => ({
+            product_id: targetProductId,
+            title: option.title,
+            shape: option.shape || "square",
+            radius: option.radius || 0,
+            type: option.type || "text",
+            values: JSON.stringify(option.values || []),
+            category_id: null,
+          }));
+          await ProductOption.bulkCreate(optionRecords, { transaction });
+        }
+      }
+
+      // 4. Atualiza Categorias (Se fornecido, substitui)
+      if (body.category_ids) {
+        await product.setCategories(body.category_ids, { transaction });
+      }
+
+      await transaction.commit();
+
+      return this.findById(targetProductId);
+
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
+  }
 }
 
 module.exports = new ProductRepository();
