@@ -177,6 +177,18 @@ class ProductRepository {
       page: safePage,
     };
   }
+
+  async findById(targetProductId) {
+    const product = await Product.findByPk(targetProductId, {
+      include: [
+        { model: ProductImage, as: "images" },
+        { model: ProductOption, as: "options" },
+        { model: Category, as: "categories", attributes: ["id", "name", "slug"] },
+      ],
+    });
+
+    return product;
+  }
 }
 
 module.exports = new ProductRepository();
