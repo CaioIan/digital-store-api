@@ -271,4 +271,41 @@ describe("Update Product - Integration Tests", () => {
     expect(product.categories).toHaveLength(1);
     expect(product.categories[0].id).toBe(newCategory.id);
   });
+
+  it("PATCH /v1/product/:id - Deve retornar 400 se campos excederem o limite de caracteres", async () => {
+    const token = generateToken(adminPayload);
+    const longString100 = "a".repeat(101);
+    const longString1000 = "a".repeat(1001);
+    const longString30 = "a".repeat(31);
+    const longString255 = "a".repeat(256);
+
+    const updatePayload = {
+      name: longString100,
+      slug: longString100,
+      description: longString1000,
+      options: [
+        {
+          title: longString30,
+          values: [longString255],
+          shape: "square",
+          radius: 0,
+          type: "text",
+        },
+      ],
+    };
+
+    const response = await request(app)
+      .patch(`/v1/product/${testProduct.id}`)
+      .set("Authorization", `Bearer ${token}`)
+      .send(updatePayload);
+
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty("errors");
+    
+    const errors = response.body.errors;
+    expect(errors.some(e => e.message.includes("100 characters"))).toBe(true); // name, slug
+    expect(errors.some(e => e.message.includes("1000 characters"))).toBe(true); // description
+    expect(errors.some(e => e.message.includes("30 characters"))).toBe(true); // option title
+    expect(errors.some(e => e.message.includes("255 characters"))).toBe(true); // option value
+  });
 });
