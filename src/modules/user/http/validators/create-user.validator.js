@@ -3,17 +3,18 @@ const { z } = require("zod");
 // Definição do Schema
 const createUserSchema = z
   .object({
-    firstname: z.string({ required_error: "Firstname is required" }).min(1, "Firstname is required"),
+    firstname: z.string({ required_error: "Firstname is required" }).min(1, "Firstname is required").max(50, "Firstname must be at most 50 characters"),
 
-    surname: z.string({ required_error: "Surname is required" }).min(1, "Surname is required"),
+    surname: z.string({ required_error: "Surname is required" }).min(1, "Surname is required").max(50, "Surname must be at most 50 characters"),
 
     email: z.string({ required_error: "Email is required" }).email("Invalid email"),
 
-    password: z.string({ required_error: "Password is required" }).min(6, "Password must be at least 6 characters"),
+    password: z.string({ required_error: "Password is required" }).min(6, "Password must be at least 6 characters").max(100, "Password must be at most 100 characters"),
 
     confirmPassword: z
       .string({ required_error: "Confirm password is required" })
-      .min(6, "Confirm password is required"),
+      .min(6, "Confirm password is required")
+      .max(100, "Confirm password must be at most 100 characters"),
 
     // Não incluir 'role' no schema para impedir que o cliente envie esse campo
   })

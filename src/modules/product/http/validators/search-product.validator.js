@@ -11,28 +11,11 @@ const searchProductSchema = z.object({
 
   page: z.coerce.number().int().min(1).default(1),
 
-  fields: z
-    .string()
-    .optional()
-    .transform((val) =>
-      val
-        ? val
-            .split(",")
-            .map((f) => f.trim())
-            .filter(Boolean)
-        : undefined,
-    ),
+  fields: z.string().optional(),
 
   match: z.string().optional(),
 
-  category_ids: z
-    .string()
-    .optional()
-    .transform((val) =>
-        val
-            ? val.split(",").map((id) => id.trim()).filter(Boolean)
-            : undefined
-    ),
+  category_ids: z.string().optional(),
 
   "price-range": z
     .string()
@@ -43,11 +26,27 @@ const searchProductSchema = z.object({
         return parts.length === 2 && !isNaN(parseFloat(parts[0])) && !isNaN(parseFloat(parts[1]));
     }, { message: "Price range must be in format 'min-max'" }),
 
-  option: z.record(z.string()).optional(),
+  option: z.any().optional(),
 });
 
 const searchProductValidator = (req, res, next) => {
-  const result = searchProductSchema.safeParse(req.query);
+  // Copia o query para um objeto simples para manipulação segura
+  const queryObj = { ...req.query };
+  const options = {};
+
+  for (const key in queryObj) {
+    if (key.startsWith("option[") && key.endsWith("]")) {
+      const optionId = key.match(/option\[(.*?)\]/)[1];
+      options[optionId] = queryObj[key];
+      delete queryObj[key]; 
+    }
+  }
+
+  if (Object.keys(options).length > 0) {
+    queryObj.option = options;
+  }
+
+  const result = searchProductSchema.safeParse(queryObj);
 
   if (!result.success) {
     const errors = result.error.issues.map((err) => ({
@@ -57,7 +56,8 @@ const searchProductValidator = (req, res, next) => {
     return res.status(400).json({ errors });
   }
 
-  req.query = result.data;
+  // Armazena os dados validados no res.locals para garantir que cheguem no controller
+  res.locals.searchParams = result.data;
   next();
 };
 

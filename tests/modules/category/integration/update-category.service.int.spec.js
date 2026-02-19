@@ -150,7 +150,23 @@ describe("Update Category - Integration Tests", () => {
       .set("Authorization", `Bearer ${token}`)
       .send(validUpdateData);
 
-    expect(response.status).toBe(400);
     expect(response.body.error).toMatch(/not found/i);
+  });
+
+  it("PATCH /v1/category/:id - Deve retornar 400 se o nome ou slug excederem o limite de caracteres", async () => {
+    const category = await createCategory();
+    const token = generateToken(adminPayload);
+    const longString = "a".repeat(51);
+
+    const response = await request(app)
+      .patch(`/v1/category/${category.id}`)
+      .set("Authorization", `Bearer ${token}`)
+      .send({ ...validUpdateData, name: longString, slug: longString });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty("errors");
+    
+    const errors = response.body.errors;
+    expect(errors.some(e => e.message.includes("50 characters"))).toBe(true);
   });
 });

@@ -149,7 +149,8 @@ class ProductRepository {
           where: {
             [Sequelize.Op.and]: optionConditions
           },
-            attributes: ["id", "title", "values"]
+          required: true, // Isso força um INNER JOIN, trazendo apenas produtos que dão match na condição
+          attributes: ["id", "title", "values", "shape", "radius", "type"]
         });
       }
     } else {

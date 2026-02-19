@@ -8,11 +8,11 @@ const imageSchema = z.object({
 
 const optionSchema = z
   .object({
-    title: z.string({ required_error: "Option title is required" }).min(1, "Option title is required"),
+    title: z.string({ required_error: "Option title is required" }).min(1, "Option title is required").max(30, "Option title must be at most 30 characters"),
     shape: z.enum(["square", "circle"]).optional(),
     radius: z.number().int().optional(),
     type: z.enum(["text", "color"]).optional(),
-    values: z.array(z.string()).optional(),
+    values: z.array(z.string().max(255, "Option value must be at most 255 characters")).optional(),
   })
   .transform((data) => {
     if (data.value && !data.values) {
@@ -25,11 +25,11 @@ const optionSchema = z
 const updateProductSchema = z
   .object({
     enabled: z.boolean().optional(),
-    name: z.string().min(1, "Name cannot be empty").optional(),
-    slug: z.string().min(1, "Slug cannot be empty").optional(),
+    name: z.string().min(1, "Name cannot be empty").max(100, "Name must be at most 100 characters").optional(),
+    slug: z.string().min(1, "Slug cannot be empty").max(100, "Slug must be at most 100 characters").optional(),
     use_in_menu: z.boolean().optional(),
     stock: z.number().int().min(0, "Stock cannot be negative").optional(),
-    description: z.string().optional(),
+    description: z.string().max(1000, "Description must be at most 1000 characters").optional(),
     price: z.number().positive("Price must be positive").optional(),
     price_with_discount: z.number().positive("Price with discount must be positive").optional(),
     category_ids: z.array(z.string().uuid("Each category_id must be a valid UUID")).optional(),

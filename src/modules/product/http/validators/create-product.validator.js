@@ -9,11 +9,11 @@ const imageSchema = z.object({
 // Schema de opção
 const optionSchema = z
   .object({
-    title: z.string({ required_error: "Option title is required" }).min(1, "Option title is required"),
+    title: z.string({ required_error: "Option title is required" }).min(1, "Option title is required").max(30, "Option title must be at most 30 characters"),
     shape: z.enum(["square", "circle"]).optional(),
     radius: z.number().int().optional(),
     type: z.enum(["text", "color"]).optional(),
-    values: z.array(z.string()).optional(),
+    values: z.array(z.string().max(255, "Option value must be at most 255 characters")).optional(),
   })
   // Normaliza "value" para "values" (payload da documentação usa ambos)
   .transform((data) => {
@@ -28,11 +28,11 @@ const optionSchema = z
 const createProductSchema = z
   .object({
     enabled: z.boolean().default(false),
-    name: z.string({ required_error: "Name is required" }).min(1, "Name is required"),
-    slug: z.string({ required_error: "Slug is required" }).min(1, "Slug is required"),
+    name: z.string({ required_error: "Name is required" }).min(1, "Name is required").max(100, "Name must be at most 100 characters"),
+    slug: z.string({ required_error: "Slug is required" }).min(1, "Slug is required").max(100, "Slug must be at most 100 characters"),
     use_in_menu: z.boolean().default(false),
     stock: z.number().int().min(0, "Stock cannot be negative").default(0),
-    description: z.string().optional(),
+    description: z.string().max(1000, "Description must be at most 1000 characters").optional(),
     price: z.number({ required_error: "Price is required" }).positive("Price must be positive"),
     price_with_discount: z.number().positive("Price with discount must be positive").optional(),
     category_ids: z.array(z.string().uuid("Each category_id must be a valid UUID")).default([]),

@@ -58,7 +58,7 @@ class SearchProductController {
         category_ids, 
         "price-range": priceRange, 
         option 
-      } = req.query;
+      } = res.locals.searchParams || req.query;
 
       const result = await SearchProductService.execute({
         page,

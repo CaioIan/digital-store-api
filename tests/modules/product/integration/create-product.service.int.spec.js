@@ -309,4 +309,45 @@ describe("Create Product - Integration Tests", () => {
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty("errors");
   });
+
+  it("POST /v1/product - Deve retornar 400 se campos excederem o limite de caracteres", async () => {
+    const token = generateToken(adminPayload);
+    const longString100 = "a".repeat(101);
+    const longString1000 = "a".repeat(1001);
+    const longString30 = "a".repeat(31);
+    const longString255 = "a".repeat(256);
+
+    const invalidData = {
+      ...validProductComplete,
+      name: longString100,
+      slug: longString100,
+      description: longString1000,
+      category_ids: [testCategory.id],
+      options: [
+        {
+          title: longString30,
+          values: [longString255],
+          shape: "square",
+          radius: 0,
+          type: "text",
+        },
+      ],
+    };
+
+    const response = await request(app).post("/v1/product").set("Authorization", `Bearer ${token}`).send(invalidData);
+
+    expect(response.status).toBe(400);
+    expect(response.body).toHaveProperty("errors");
+    
+    // Verificando se todos os campos inválidos foram capturados
+    const errors = response.body.errors;
+    // Name e Slug tem limite de 100
+    expect(errors.some(e => e.message.includes("100 characters"))).toBe(true); 
+    // Description tem limite de 1000
+    expect(errors.some(e => e.message.includes("1000 characters"))).toBe(true); 
+    // Option Title tem limite de 30
+    expect(errors.some(e => e.message.includes("30 characters"))).toBe(true); 
+    // Option Value tem limite de 255
+    expect(errors.some(e => e.message.includes("255 characters"))).toBe(true); 
+  });
 });

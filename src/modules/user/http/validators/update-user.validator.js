@@ -4,8 +4,8 @@ const { z } = require("zod");
 
 const updateUserSchema = z
   .object({
-    firstname: z.string().min(2).max(100).optional(),
-    surname: z.string().min(2).max(100).optional(),
+    firstname: z.string().min(2).max(50).optional(),
+    surname: z.string().min(2).max(50).optional(),
   })
   .strict();
 
