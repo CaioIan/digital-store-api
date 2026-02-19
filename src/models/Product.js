@@ -6,10 +6,12 @@ module.exports = (sequelize) => {
       Product.hasMany(models.ProductImage, {
         foreignKey: "product_id",
         as: "images",
+        onDelete: "CASCADE",
       });
       Product.hasMany(models.ProductOption, {
         foreignKey: "product_id",
         as: "options",
+        onDelete: "CASCADE",
       });
       Product.belongsToMany(models.Category, {
         through: models.ProductCategory,

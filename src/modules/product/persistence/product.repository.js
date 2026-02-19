@@ -251,6 +251,27 @@ class ProductRepository {
       throw error;
     }
   }
+
+  async deleteProduct(targetProductId) {
+    const transaction = await sequelize.transaction();
+    try {
+        const product = await Product.findByPk(targetProductId);
+        
+        if (!product) {
+            throw new Error('Product not found');
+        }
+
+        // Hard Delete - devido ao CASCADE configurado nas migrations, 
+        // as imagens e options serão deletadas automaticamente pelo banco
+        await product.destroy({ transaction });
+
+        await transaction.commit();
+        return true;
+    } catch (error) {
+        await transaction.rollback();
+        throw error;
+    }
+  }
 }
 
 module.exports = new ProductRepository();
