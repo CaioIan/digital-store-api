@@ -1,6 +1,40 @@
 const UploadImageService = require("../../core/services/upload-image.service");
 const UploadImageResponseDto = require("../dto/response/upload-image.response.dto");
 
+/**
+ * @swagger
+ * /v1/product/upload-image:
+ *   post:
+ *     summary: Upload de imagem
+ *     tags:
+ *       - Produtos
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               type:
+ *                 type: string
+ *                 example: image/png
+ *               content:
+ *                 type: string
+ *                 description: Base64 da imagem
+ *     responses:
+ *       200:
+ *         description: Upload realizado com sucesso
+ *       400:
+ *         description: Erro no upload
+ */
 class UploadImageController {
   async handle(req, res) {
     try {
