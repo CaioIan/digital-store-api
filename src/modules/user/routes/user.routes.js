@@ -10,6 +10,7 @@ const authVerificationMiddleware = require("../../../shared/auth/auth-verificati
 const { loginValidator } = require("../http/validators/login.validator");
 const { updateUserValidator } = require("../http/validators/update-user.validator");
 const asyncHandler = require("../../../shared/middlewares/async-handler.middleware");
+const { authLimiter, createAccountLimiter } = require("../../../config/rate-limit.config");
 
 /**
  * Router Express para o módulo de usuários.
@@ -26,8 +27,8 @@ const asyncHandler = require("../../../shared/middlewares/async-handler.middlewa
  */
 const router = express.Router();
 
-router.post("/v1/user/login", loginValidator, asyncHandler(LoginController.handle));
-router.post("/v1/user", createUserValidator, asyncHandler(createUserController.handle));
+router.post("/v1/user/login", authLimiter, loginValidator, asyncHandler(LoginController.handle));
+router.post("/v1/user", createAccountLimiter, createUserValidator, asyncHandler(createUserController.handle));
 router.get("/v1/user/:id", authVerificationMiddleware, asyncHandler(GetUserByIdController.handle));
 router.patch(
   "/v1/user/:id",
