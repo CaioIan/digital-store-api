@@ -25,6 +25,8 @@ describe("Delete Product Integration Test", () => {
     adminUser = await User.create({
       firstname: "Admin",
       surname: "user",
+      cpf: "99999999901",
+      phone: "11999990001",
       email: "admin@example.com",
       password: "password123",
       role: "ADMIN",
@@ -33,6 +35,8 @@ describe("Delete Product Integration Test", () => {
     normalUser = await User.create({
       firstname: "Normal",
       surname: "user",
+      cpf: "99999999902",
+      phone: "11999990002",
       email: "user@example.com",
       password: "password123",
       role: "USER",

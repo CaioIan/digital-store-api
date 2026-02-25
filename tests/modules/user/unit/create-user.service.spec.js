@@ -14,6 +14,8 @@ describe("CreateUserService - Unit Tests", () => {
   const validUserData = {
     firstname: "John",
     surname: "Doe",
+    cpf: "12345678901",
+    phone: "11999990001",
     email: "john.doe@example.com",
     password: "password123",
     confirmPassword: "password123",
@@ -38,9 +40,11 @@ describe("CreateUserService - Unit Tests", () => {
       expect(userRepository.create).toHaveBeenCalledWith({
         firstname: validUserData.firstname,
         surname: validUserData.surname,
+        cpf: validUserData.cpf,
+        phone: validUserData.phone,
         email: validUserData.email,
         password: validUserData.password,
-      });
+      }, null);
       expect(result).toHaveProperty("email");
       expect(result.email).toBe(validUserData.email);
     });
@@ -62,9 +66,11 @@ describe("CreateUserService - Unit Tests", () => {
       expect(userRepository.create).toHaveBeenCalledWith({
         firstname: validUserData.firstname,
         surname: validUserData.surname,
+        cpf: validUserData.cpf,
+        phone: validUserData.phone,
         email: validUserData.email,
         password: validUserData.password,
-      });
+      }, null);
       expect(result).toHaveProperty("email");
       expect(result.email).toBe(validUserData.email);
     });

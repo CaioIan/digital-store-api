@@ -32,8 +32,30 @@
  *                   type: string
  *                 surname:
  *                   type: string
+ *                 cpf:
+ *                   type: string
+ *                 phone:
+ *                   type: string
  *                 email:
  *                   type: string
+ *                 addresses:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       endereco:
+ *                         type: string
+ *                       bairro:
+ *                         type: string
+ *                       cidade:
+ *                         type: string
+ *                       cep:
+ *                         type: string
+ *                       complemento:
+ *                         type: string
+ *                         nullable: true
  *       400:
  *         description: Erro ao buscar usuário
  *       403:

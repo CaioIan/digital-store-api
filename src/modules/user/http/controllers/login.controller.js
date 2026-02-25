@@ -45,6 +45,10 @@ const LoginResponseDto = require("../dto/response/login.response.dto");
  *                       type: string
  *                     surname:
  *                       type: string
+ *                     cpf:
+ *                       type: string
+ *                     phone:
+ *                       type: string
  *                     email:
  *                       type: string
  *

@@ -5,6 +5,8 @@ const updateUserResponseSchema = z.object({
   id: z.uuid(),
   firstname: z.string(),
   surname: z.string(),
+  cpf: z.string(),
+  phone: z.string(),
   email: z.email(),
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -18,7 +20,7 @@ const UpdateUserResponseDto = {
   /**
    * Transforma um registro bruto de usuário no formato padronizado da API.
    * @param {Object} payload - Dados brutos do usuário vindos da camada de service.
-   * @returns {Object} Resposta filtrada com id, firstname, surname, email, createdAt e updatedAt.
+   * @returns {Object} Resposta filtrada com id, firstname, surname, cpf, phone, email, createdAt e updatedAt.
    */
   toResponse(payload) {
     return updateUserResponseSchema.parse(payload);

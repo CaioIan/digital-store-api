@@ -49,6 +49,10 @@ const UpdateUserResponseDto = require("../dto/response/update-user.response.dto"
  *                   type: string
  *                 surname:
  *                   type: string
+ *                 cpf:
+ *                   type: string
+ *                 phone:
+ *                   type: string
  *                 email:
  *                   type: string
  *                 createdAt:

@@ -1,4 +1,4 @@
-const { User } = require("../../../models");
+const { User, UserAddress, sequelize } = require("../../../models");
 
 /**
  * Repositório responsável por todas as operações de acesso a dados de Usuário.
@@ -7,27 +7,51 @@ const { User } = require("../../../models");
 class UserRepository {
   /**
    * Cria um novo usuário com a role forçada para 'USER'.
+   * Se dados de endereço forem fornecidos, cria o endereço na mesma transação.
    * O campo role nunca é aceito de entrada externa para prevenir escalação de privilégios.
    * @param {Object} userData - Dados do usuário a ser criado.
    * @param {string} userData.firstname - Primeiro nome do usuário.
    * @param {string} userData.surname - Sobrenome do usuário.
+   * @param {string} userData.cpf - CPF do usuário.
+   * @param {string} userData.phone - Telefone do usuário.
    * @param {string} userData.email - Endereço de e-mail do usuário.
    * @param {string} userData.password - Senha do usuário (será hasheada pelo model).
-   * @returns {Promise<Object>} O registro do usuário criado.
+   * @param {Object|null} addressData - Dados de endereço de entrega (opcional).
+   * @returns {Promise<Object>} O registro do usuário criado com endereços incluídos.
    */
-  async create({ firstname, surname, email, password }) {
-    const user = await User.create({ firstname, surname, email, password, role: "USER" });
-    return user;
+  async create({ firstname, surname, cpf, phone, email, password }, addressData = null) {
+    const result = await sequelize.transaction(async (t) => {
+      const user = await User.create(
+        { firstname, surname, cpf, phone, email, password, role: "USER" },
+        { transaction: t },
+      );
+
+      if (addressData) {
+        await UserAddress.create(
+          { ...addressData, user_id: user.id },
+          { transaction: t },
+        );
+      }
+
+      return await User.findByPk(user.id, {
+        include: [{ model: UserAddress, as: "addresses" }],
+        transaction: t,
+      });
+    });
+
+    return result;
   }
 
   /**
    * Busca um usuário pela chave primária (ID), excluindo registros com soft-delete.
+   * Inclui os endereços cadastrados do usuário.
    * @param {string} targetUserId - UUID do usuário a ser buscado.
    * @returns {Promise<Object|null>} O registro do usuário ou null se não encontrado.
    */
   async findById(targetUserId) {
     const user = await User.findByPk(targetUserId, {
       where: { deleted_at: null },
+      include: [{ model: UserAddress, as: "addresses" }],
     });
     return user;
   }

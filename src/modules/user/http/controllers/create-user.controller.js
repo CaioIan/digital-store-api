@@ -17,6 +17,8 @@ const CreateUserResponseDto = require("../dto/response/create-user.response.dto"
  *             required:
  *               - firstname
  *               - surname
+ *               - cpf
+ *               - phone
  *               - email
  *               - password
  *               - confirmPassword
@@ -27,6 +29,12 @@ const CreateUserResponseDto = require("../dto/response/create-user.response.dto"
  *               surname:
  *                 type: string
  *                 example: Silva
+ *               cpf:
+ *                 type: string
+ *                 example: "12345678901"
+ *               phone:
+ *                 type: string
+ *                 example: "11999990001"
  *               email:
  *                 type: string
  *                 format: email
@@ -39,6 +47,26 @@ const CreateUserResponseDto = require("../dto/response/create-user.response.dto"
  *                 type: string
  *                 format: password
  *                 example: senha123
+ *               endereco:
+ *                 type: string
+ *                 description: "Endereço de entrega (obrigatório se qualquer campo de endereço for enviado)"
+ *                 example: "Rua Exemplo, 123"
+ *               bairro:
+ *                 type: string
+ *                 description: "Bairro (obrigatório se qualquer campo de endereço for enviado)"
+ *                 example: Centro
+ *               cidade:
+ *                 type: string
+ *                 description: "Cidade (obrigatório se qualquer campo de endereço for enviado)"
+ *                 example: São Paulo
+ *               cep:
+ *                 type: string
+ *                 description: "CEP (obrigatório se qualquer campo de endereço for enviado)"
+ *                 example: "01001000"
+ *               complemento:
+ *                 type: string
+ *                 description: "Complemento do endereço (sempre opcional)"
+ *                 example: Apto 42
  *     responses:
  *       201:
  *         description: Usuário criado com sucesso
@@ -57,10 +85,40 @@ const CreateUserResponseDto = require("../dto/response/create-user.response.dto"
  *                 surname:
  *                   type: string
  *                   example: Silva
+ *                 cpf:
+ *                   type: string
+ *                   example: "12345678901"
+ *                 phone:
+ *                   type: string
+ *                   example: "11999990001"
  *                 email:
  *                   type: string
  *                   format: email
  *                   example: joao@email.com
+ *                 addresses:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         format: uuid
+ *                       endereco:
+ *                         type: string
+ *                         example: "Rua Exemplo, 123"
+ *                       bairro:
+ *                         type: string
+ *                         example: Centro
+ *                       cidade:
+ *                         type: string
+ *                         example: São Paulo
+ *                       cep:
+ *                         type: string
+ *                         example: "01001000"
+ *                       complemento:
+ *                         type: string
+ *                         nullable: true
+ *                         example: Apto 42
  *       400:
  *         description: Dados inválidos ou senhas não conferem
  *         content:

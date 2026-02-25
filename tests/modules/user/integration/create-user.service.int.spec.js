@@ -15,6 +15,8 @@ describe("CreateUserService - Integration Tests", () => {
   const validUserData = {
     firstname: "John",
     surname: "Doe",
+    cpf: "12345678901",
+    phone: "11999990001",
     email: "john.doe@example.com",
     password: "password123",
     confirmPassword: "password123",

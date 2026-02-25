@@ -1,15 +1,18 @@
 // Helper para testes de integração - Configuração do banco de testes
-const { sequelize, User } = require("../../src/models");
+const { sequelize, User, UserAddress } = require("../../src/models");
 
 /**
  * Inicializa o banco de testes antes de executar os testes
- * Sincroniza apenas o modelo User para os testes do módulo user
+ * Sincroniza os modelos User e UserAddress para os testes do módulo user
  */
 async function setupTestDatabase() {
   try {
     await sequelize.authenticate();
-    // Sincroniza apenas o modelo User (force: true recria a tabela)
+    // Desabilita FK checks para permitir drop/recreate das tabelas com dependências
+    await sequelize.query("SET FOREIGN_KEY_CHECKS = 0", { raw: true });
+    await UserAddress.sync({ force: true });
     await User.sync({ force: true });
+    await sequelize.query("SET FOREIGN_KEY_CHECKS = 1", { raw: true });
   } catch (error) {
     console.error("Erro ao conectar ao banco de testes:", error);
     throw error;
@@ -21,8 +24,11 @@ async function setupTestDatabase() {
  */
 async function clearTestDatabase() {
   try {
-    // Usa truncate com cascade para limpar dados mesmo com foreign keys
+    // Desabilita FK checks para limpar dados mesmo com foreign keys
+    await sequelize.query("SET FOREIGN_KEY_CHECKS = 0", { raw: true });
+    await UserAddress.destroy({ where: {}, truncate: true, force: true });
     await User.destroy({ where: {}, truncate: true, force: true });
+    await sequelize.query("SET FOREIGN_KEY_CHECKS = 1", { raw: true });
   } catch (error) {
     // Se a tabela não existir, ignora o erro
     if (error.original?.code !== "ER_NO_SUCH_TABLE") {
@@ -51,6 +57,8 @@ async function createTestUser(userData = {}) {
   const defaultData = {
     firstname: "Test",
     surname: "user",
+    cpf: `000${Date.now().toString().slice(-8)}`,
+    phone: `119${Date.now().toString().slice(-8)}`,
     email: `test-${Date.now()}-${Math.random().toString(36).slice(2)}@example.com`,
     password: "password123",
     role: "USER",
@@ -66,6 +74,8 @@ async function createTestAdmin(userData = {}) {
   const defaultData = {
     firstname: "Admin",
     surname: "user",
+    cpf: `999${Date.now().toString().slice(-8)}`,
+    phone: `119${Date.now().toString().slice(-8)}`,
     email: `admin-${Date.now()}-${Math.random().toString(36).slice(2)}@example.com`,
     password: "admin123",
     role: "ADMIN",
@@ -82,4 +92,6 @@ module.exports = {
   createTestAdmin,
   sequelize,
   User,
+  UserAddress,
 };
+
