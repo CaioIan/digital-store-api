@@ -72,6 +72,14 @@ class LoginController {
     const { email, password } = req.body;
 
     const result = await LoginService.execute({ email, password });
+
+    res.cookie("access_token", result.token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 1000 * 60 * 60 * 24, // 24 horas
+    });
+
     return res.status(200).json(LoginResponseDto.toResponse(result));
   }
 }

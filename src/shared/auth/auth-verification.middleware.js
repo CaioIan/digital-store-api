@@ -1,12 +1,21 @@
 const { verifyToken } = require("./jwt");
 
 function authVerificationMiddleware(req, res, next) {
-  const authHeader = req.headers["authorization"];
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  let token = null;
+
+  // 1. Tentar obter do cookie (HTTP-only)
+  if (req.cookies && req.cookies.access_token) {
+    token = req.cookies.access_token;
+  } 
+  // 2. Falback para o Authorization Header
+  else if (req.headers["authorization"] && req.headers["authorization"].startsWith("Bearer ")) {
+    token = req.headers["authorization"].split(" ")[1];
+  }
+
+  if (!token) {
     return res.status(401).json({ error: "Token não fornecido" });
   }
 
-  const token = authHeader.split(" ")[1];
   const payload = verifyToken(token);
   if (!payload) {
     return res.status(401).json({ error: "Token inválido ou expirado" });

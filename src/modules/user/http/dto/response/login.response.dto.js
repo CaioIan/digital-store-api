@@ -2,7 +2,6 @@ const { z } = require("zod");
 
 /** Schema Zod que define o formato da resposta de login. */
 const loginResponseSchema = z.object({
-  token: z.string(),
   user: z.object({
     id: z.uuid(),
     firstname: z.string(),
@@ -21,7 +20,7 @@ const LoginResponseDto = {
   /**
    * Transforma o resultado bruto do login no formato padronizado da API.
    * @param {Object} payload - Dados brutos do login contendo token e informações do usuário.
-   * @returns {Object} Resposta filtrada contendo token e usuário (id, firstname, surname, cpf, phone, email).
+   * @returns {Object} Resposta filtrada contendo usuário (id, firstname, surname, cpf, phone, email).
    */
   toResponse(payload) {
     return loginResponseSchema.parse(payload);

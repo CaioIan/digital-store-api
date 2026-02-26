@@ -1,5 +1,6 @@
 const cors = require("cors");
 const express = require("express");
+const cookieParser = require("cookie-parser");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./config/swagger");
 const { globalLimiter } = require("./config/rate-limit.config");
@@ -18,8 +19,7 @@ const categoryRoutes = require("./modules/category/routes/category.routes");
 const productRoutes = require("./modules/product/routes/product.routes");
 
 app.use(express.json());
-
-// Limite de Taxa Global
+app.use(cookieParser());// Limite de Taxa Global
 app.use(globalLimiter);
 
 // Rota da documentação Swagger

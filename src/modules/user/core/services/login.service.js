@@ -38,6 +38,8 @@ class LoginService {
         firstname: user.firstname,
         surname: user.surname,
         email: user.email,
+        cpf: user.cpf,
+        phone: user.phone,
       },
     };
   }
