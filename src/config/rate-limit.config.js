@@ -39,11 +39,11 @@ const authLimiter = rateLimit({
  * Middleware Super Restrito para criação de novas contas
  */
 const createAccountLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // Janela de 1 HORA
-  max: 5, // Apenas 5 contas podem ser abertas pelo mesmo IP/Hora
+  windowMs: 5 * 60 * 1000, // Janela de 5 minutos
+  max: 5, // Apenas 5 contas podem ser criadas pelo mesmo IP a cada 5 minutos
   message: {
     status: 429,
-    message: "Muitas requisições. Tente novamente em 1 hora",
+    message: "Muitas requisições. Tente novamente em 5 minutos",
   },
   standardHeaders: true, 
   legacyHeaders: false, 

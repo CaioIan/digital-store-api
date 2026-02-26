@@ -1,10 +1,17 @@
+const cors = require("cors");
 const express = require("express");
-
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./config/swagger");
 const { globalLimiter } = require("./config/rate-limit.config");
 
+const corsOptions = {
+  origin: "http://localhost:5173",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
+};
+
 const app = express();
+app.use(cors(corsOptions));
 
 const userRoutes = require("./modules/user/routes/user.routes");
 const categoryRoutes = require("./modules/category/routes/category.routes");
