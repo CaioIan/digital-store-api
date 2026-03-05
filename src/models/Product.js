@@ -62,6 +62,14 @@ module.exports = (sequelize) => {
         type: DataTypes.TEXT,
         allowNull: true,
       },
+      brand: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      gender: {
+        type: DataTypes.ENUM("Masculino", "Feminino", "Unisex"),
+        allowNull: true,
+      },
       price: {
         type: DataTypes.FLOAT,
         allowNull: false,

@@ -41,6 +41,16 @@ const SearchProductResponseDto = require("../dto/response/search-product.respons
  *           type: string
  *         description: IDs das categorias separados por vírgula
  *       - in: query
+ *         name: brand
+ *         schema:
+ *           type: string
+ *         description: Filtro exato de marca
+ *       - in: query
+ *         name: gender
+ *         schema:
+ *           type: string
+ *         description: Filtro de gênero (Masculino, Feminino, Unisex)
+ *       - in: query
  *         name: price-range
  *         schema:
  *           type: string
@@ -70,6 +80,8 @@ class SearchProductController {
       limit,
       fields,
       match,
+      brand,
+      gender,
       category_ids,
       "price-range": priceRange,
       option,
@@ -80,6 +92,8 @@ class SearchProductController {
       limit,
       fields,
       match,
+      brand,
+      gender,
       category_ids,
       priceRange,
       option,

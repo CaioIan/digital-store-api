@@ -118,12 +118,19 @@ class OrderRepository {
   }
 
   /**
-   * Retorna todos os pedidos de um usuário, ordenados do mais recente para o mais antigo.
+   * Retorna todos os pedidos de um usuário, ordenados do mais recente para o mais antigo, com paginação.
    * @param {string} userId - ID do usuário.
-   * @returns {Promise<Array>} Lista de pedidos com seus itens.
+   * @param {Object} pagination - Parâmetros de paginação.
+   * @param {number} pagination.limit - Limite de itens.
+   * @param {number} pagination.page - Página atual.
+   * @returns {Promise<{data: Array, total: number, limit: number, page: number}>} Lista de pedidos e totais.
    */
-  async findAllByUser(userId) {
-    return await Order.findAll({
+  async findAllByUser(userId, { limit, page } = {}) {
+    // 1. Paginação
+    const safeLimit = parseInt(limit, 10) || 10;
+    const safePage = parseInt(page, 10) || 1;
+    
+    const queryOptions = {
       where: { user_id: userId },
       include: [
         {
@@ -132,7 +139,22 @@ class OrderRepository {
         },
       ],
       order: [["created_at", "DESC"]],
-    });
+      distinct: true,
+    };
+    
+    if (safeLimit !== -1) {
+      queryOptions.limit = safeLimit;
+      queryOptions.offset = (Math.max(safePage, 1) - 1) * safeLimit;
+    }
+
+    const { count, rows } = await Order.findAndCountAll(queryOptions);
+
+    return {
+      data: rows,
+      total: count,
+      limit: safeLimit,
+      page: safePage,
+    };
   }
 
   /**

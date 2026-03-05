@@ -4,10 +4,16 @@ const ListUserOrdersResponseDto = require("../dto/list-user-orders.response.dto"
 class ListUserOrdersController {
   async handle(req, res) {
     const userId = req.user.sub;
+    const { limit, page } = req.query;
 
-    const orders = await ListUserOrdersService.execute(userId);
+    const result = await ListUserOrdersService.execute(userId, limit, page);
 
-    const dto = ListUserOrdersResponseDto.fromDomain(orders);
+    const dto = {
+      data: ListUserOrdersResponseDto.fromDomain(result.data),
+      total: result.total,
+      limit: result.limit,
+      page: result.page,
+    };
 
     return res.status(200).json(dto);
   }

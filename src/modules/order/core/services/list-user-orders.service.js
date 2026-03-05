@@ -5,14 +5,16 @@ const OrderRepository = require("../../persistence/order.repository");
  */
 class ListUserOrdersService {
   /**
-   * Retorna todos os pedidos do usuário autenticado.
+   * Retorna todos os pedidos do usuário autenticado com paginação.
    * @param {string} userId - UUID do usuário logado.
-   * @returns {Promise<Array>} Lista de pedidos (pode ser vazia).
+   * @param {string} [limit] - Limite de itens
+   * @param {string} [page] - Página atual
+   * @returns {Promise<Object>} Resultado paginado.
    */
 
-  async execute(userId) {
-    const orders = await OrderRepository.findAllByUser(userId);
-    return orders;
+  async execute(userId, limit, page) {
+    const result = await OrderRepository.findAllByUser(userId, { limit, page });
+    return result;
   }
 }
 

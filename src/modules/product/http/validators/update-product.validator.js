@@ -39,6 +39,8 @@ const updateProductSchema = z
     use_in_menu: z.boolean().optional(),
     stock: z.number().int().min(0, "Estoque não pode ser negativo").optional(),
     description: z.string().max(1000, "Descrição deve ter no máximo 1000 caracteres").optional(),
+    brand: z.string().max(100, "Marca deve ter no máximo 100 caracteres").optional(),
+    gender: z.enum(["Masculino", "Feminino", "Unisex"]).optional(),
     price: z.number().positive("Preço deve ser positivo").optional(),
     price_with_discount: z.number().positive("Preço com desconto deve ser positivo").optional(),
     category_ids: z.array(z.uuid("Cada category_id deve ser um UUID válido")).optional(),

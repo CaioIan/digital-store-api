@@ -92,12 +92,14 @@ class ProductRepository {
    * @param {number} [params.page=1] - Número da página.
    * @param {string} [params.fields] - Campos a serem retornados (separados por vírgula).
    * @param {string} [params.match] - Termo de busca para nome ou descrição.
+   * @param {string} [params.brand] - Filtro de marca (Case Insensitive no MySQL).
+   * @param {string} [params.gender] - Filtro de gênero (Estrito no Enum).
    * @param {string} [params.category_ids] - IDs das categorias (separados por vírgula).
    * @param {string} [params.priceRange] - Faixa de preço no formato "min-max".
    * @param {Object} [params.option] - Filtros de opções (ex: { "45": "GG,PP" }).
    * @returns {Promise<{data: Object[], total: number, limit: number, page: number}>} Resultado paginado.
    */
-  async searchProducts({ limit, page, fields, match, category_ids, priceRange, option } = {}) {
+  async searchProducts({ limit, page, fields, match, brand, gender, category_ids, priceRange, option } = {}) {
     const queryOptions = {
       where: {},
       include: [],
@@ -121,6 +123,8 @@ class ProductRepository {
       "price",
       "price_with_discount",
       "description",
+      "brand",
+      "gender",
       "enabled",
       "stock",
       "use_in_menu",
@@ -138,6 +142,16 @@ class ProductRepository {
         { name: { [Sequelize.Op.like]: `%${match}%` } },
         { description: { [Sequelize.Op.like]: `%${match}%` } },
       ];
+    }
+    
+    // 3.1.2 Brand
+    if (brand) {
+      queryOptions.where.brand = brand;
+    }
+
+    // 3.1.3 Gender
+    if (gender) {
+      queryOptions.where.gender = gender;
     }
 
     // 3.2 Categorias

@@ -22,6 +22,10 @@ const searchProductSchema = z.object({
 
   category_ids: z.string().optional(),
 
+  brand: z.string().optional(),
+
+  gender: z.enum(["Masculino", "Feminino", "Unisex"]).optional(),
+
   "price-range": z
     .string()
     .optional()
