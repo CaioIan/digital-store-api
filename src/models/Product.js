@@ -70,6 +70,14 @@ module.exports = (sequelize) => {
         type: DataTypes.FLOAT,
         allowNull: false,
       },
+      brand: {
+        type: DataTypes.STRING(100),
+        allowNull: true,
+      },
+      gender: {
+        type: DataTypes.ENUM("Masculino", "Feminino", "Unisex"),
+        allowNull: true,
+      },
     },
     {
       sequelize,

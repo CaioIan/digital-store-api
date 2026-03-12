@@ -43,11 +43,20 @@ const createProductSchema = z
       .max(100, "Slug deve ter no máximo 100 caracteres"),
     use_in_menu: z.boolean().default(false),
     stock: z.number().int().min(0, "Estoque não pode ser negativo").default(0),
-    description: z.string().max(1000, "Descrição deve ter no máximo 1000 caracteres").optional(),
+    description: z
+      .string({ required_error: "Descrição é obrigatória" })
+      .min(10, "Descrição deve ter no mínimo 10 caracteres")
+      .max(1000, "Descrição deve ter no máximo 1000 caracteres"),
+    brand: z.string().max(100, "Marca deve ter no máximo 100 caracteres").optional(),
+    gender: z.enum(["Masculino", "Feminino", "Unisex"]).optional(),
     price: z.number({ required_error: "Preço é obrigatório" }).positive("Preço deve ser positivo"),
     price_with_discount: z.number().positive("Preço com desconto deve ser positivo").optional(),
-    category_ids: z.array(z.uuid("Cada category_id deve ser um UUID válido")).default([]),
-    images: z.array(imageSchema).default([]),
+    category_ids: z
+      .array(z.uuid("Cada category_id deve ser um UUID válido"), { required_error: "Pelo menos uma categoria é obrigatória" })
+      .min(1, "Pelo menos uma categoria é obrigatória"),
+    images: z
+      .array(imageSchema, { required_error: "Pelo menos uma imagem é obrigatória" })
+      .min(1, "Pelo menos uma imagem é obrigatória"),
     options: z.array(optionSchema).default([]),
   })
   .strict()

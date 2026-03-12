@@ -6,7 +6,7 @@ const swaggerSpec = require("./config/swagger");
 const { globalLimiter } = require("./config/rate-limit.config");
 
 const corsOptions = {
-  origin: "http://localhost:5173",
+  origin: ["http://localhost:5173", "http://localhost:5174"],
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
 };
