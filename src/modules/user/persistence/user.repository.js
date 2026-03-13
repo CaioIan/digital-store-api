@@ -123,6 +123,33 @@ class UserRepository {
 
     return await this.findById(userId);
   }
+
+  /**
+   * Retorna todos os usuários (não deletados) com paginação.
+   * @param {Object} options - Parâmetros de paginação.
+   * @param {number} options.limit - Limite de itens (Default: 15).
+   * @param {number} options.page - Página atual (Default: 1).
+   * @returns {Promise<{data: Array, total: number, limit: number, page: number}>} Lista de usuários e metadados.
+   */
+  async findAll({ limit, page } = {}) {
+    const safeLimit = parseInt(limit, 10) || 15;
+    const safePage = parseInt(page, 10) || 1;
+
+    const { count, rows } = await User.findAndCountAll({
+      where: { deleted_at: null },
+      attributes: { exclude: ["password"] }, // Nunca retornar senha na listagem
+      limit: safeLimit,
+      offset: (Math.max(safePage, 1) - 1) * safeLimit,
+      order: [["created_at", "DESC"]],
+    });
+
+    return {
+      data: rows,
+      total: count,
+      limit: safeLimit,
+      page: safePage,
+    };
+  }
 }
 
 module.exports = new UserRepository();
