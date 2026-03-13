@@ -118,32 +118,38 @@ class OrderRepository {
   }
 
   /**
-   * Retorna todos os pedidos de um usuário, ordenados do mais recente para o mais antigo, com paginação.
-   * @param {string} userId - ID do usuário.
-   * @param {Object} pagination - Parâmetros de paginação.
-   * @param {number} pagination.limit - Limite de itens.
-   * @param {number} pagination.page - Página atual.
+   * Retorna os pedidos de todos os usuários ou de um usuário específico, ordenados do mais recente para o mais antigo, com paginação.
+   * @param {Object} options - Opções de busca.
+   * @param {string} [options.userId] - Opcional: ID do usuário para filtrar.
+   * @param {number} [options.limit] - Limite de itens.
+   * @param {number} [options.page] - Página atual.
    * @returns {Promise<{data: Array, total: number, limit: number, page: number}>} Lista de pedidos e totais.
    */
-  async findAllByUser(userId, { limit, page } = {}) {
-    // 1. Paginação Segura: Garantindo valores padrões caso o Frontend não envie
+  async findAll({ userId, limit, page } = {}) {
     const safeLimit = parseInt(limit, 10) || 10;
     const safePage = parseInt(page, 10) || 1;
     
     const queryOptions = {
-      where: { user_id: userId },
+      where: {},
       include: [
         {
           model: OrderItem,
           as: "items",
         },
+        {
+          model: require("../../../models").User,
+          as: "user",
+          attributes: ["firstname", "surname", "email"]
+        }
       ],
       order: [["created_at", "DESC"]],
       distinct: true,
     };
     
-    // 2. Aplicar offset baseado na página solicitada
-    // Se limit for -1, ignora a paginação e traz todos os resultados
+    if (userId) {
+      queryOptions.where.user_id = userId;
+    }
+
     if (safeLimit !== -1) {
       queryOptions.limit = safeLimit;
       queryOptions.offset = (Math.max(safePage, 1) - 1) * safeLimit;
@@ -157,6 +163,38 @@ class OrderRepository {
       limit: safeLimit,
       page: safePage,
     };
+  }
+
+  /**
+   * Retorna todos os pedidos de um usuário, ordenados do mais recente para o mais antigo, com paginação.
+   * @deprecated Utilize o método findAll({ userId, ... }) em vez deste.
+   * @param {string} userId - ID do usuário.
+   * @param {Object} pagination - Parâmetros de paginação.
+   * @param {number} pagination.limit - Limite de itens.
+   * @param {number} pagination.page - Página atual.
+   * @returns {Promise<{data: Array, total: number, limit: number, page: number}>} Lista de pedidos e totais.
+   */
+  async findAllByUser(userId, { limit, page } = {}) {
+    return this.findAll({ userId, limit, page });
+  }
+
+  /**
+   * Atualiza o status de um pedido.
+   * @param {string} orderId - ID ou UUID do pedido.
+   * @param {string} newStatus - Novo status.
+   * @returns {Promise<Object|null>} O registro atualizado ou null se não encontrado.
+   */
+  async updateStatus(orderId, newStatus) {
+    const [updated] = await Order.update(
+      { status: newStatus },
+      { where: { id: orderId } }
+    );
+
+    if (!updated) return null;
+
+    return await Order.findByPk(orderId, {
+      include: [{ model: OrderItem, as: "items" }],
+    });
   }
 
   /**
