@@ -223,6 +223,9 @@ class ProductRepository {
       attributes: ["id", "path", "enabled"],
     });
 
+    // 4. Ordenação global e de relações
+    queryOptions.order = [[{ model: ProductImage, as: "images" }, "id", "ASC"]];
+
     const { count, rows } = await Product.findAndCountAll(queryOptions);
 
     return {
@@ -245,6 +248,7 @@ class ProductRepository {
         { model: ProductOption, as: "options" },
         { model: Category, as: "categories", attributes: ["id", "name", "slug"] },
       ],
+      order: [[{ model: ProductImage, as: "images" }, "id", "ASC"]],
     });
 
     return product;
@@ -260,8 +264,11 @@ class ProductRepository {
   async updateProduct(targetProductId, body) {
     const transaction = await sequelize.transaction();
     try {
-      // 1. Atualiza dados básicos do produto
-      await Product.update(body, {
+      // 1. Extrai apenas os campos que pertencem à tabela 'products'
+      const { images, options, category_ids, ...productData } = body;
+
+      // 2. Atualiza apenas dados básicos do produto
+      await Product.update(productData, {
         where: { id: targetProductId },
         transaction,
       });

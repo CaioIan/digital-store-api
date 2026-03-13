@@ -30,14 +30,9 @@ class UpdateProductService {
       throw new AppError("Recurso não encontrado.", 404);
     }
 
-    // Processa imagens (resolve URLs) antes de passar ao repository
+    // Processa imagens: se o front mandar {type, content}, extraímos apenas o content (URL)
     if (body.images && body.images.length > 0) {
-      const processedImageUrls = [];
-      for (const image of body.images) {
-        const url = await processImage(image.content, image.type);
-        processedImageUrls.push(url);
-      }
-      body.images = processedImageUrls;
+      body.images = body.images.map((img) => img.content);
     }
 
     const updatedProduct = await ProductRepository.updateProduct(targetProductId, body);
