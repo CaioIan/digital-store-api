@@ -5,6 +5,10 @@ const authVerificationMiddleware = require("../../../shared/auth/auth-verificati
 const CreateOrderController = require("../http/controllers/create-order.controller");
 const GetOrderByIdController = require("../http/controllers/get-order-by-id.controller");
 const ListUserOrdersController = require("../http/controllers/list-user-orders.controller");
+const AdminListOrdersController = require("../http/controllers/admin-list-orders.controller");
+const UpdateOrderStatusController = require("../http/controllers/update-order-status.controller");
+
+const roleGuardMiddleware = require("../../../shared/middlewares/role-guard.middleware");
 
 const { createOrderValidator } = require("../http/validators/create-order.validator");
 const { getOrderByIdValidator } = require("../http/validators/get-order-by-id.validator");
@@ -28,6 +32,27 @@ router.get(
   "/v1/orders",
   authVerificationMiddleware,
   asyncHandler(ListUserOrdersController.handle)
+);
+
+/**
+ * Endpoint para Admin Listar todos os Pedidos de um usuário específico
+ * Requer autenticação e permissão de ADMIN.
+ */
+router.get(
+  "/v1/admin/orders",
+  authVerificationMiddleware,
+  roleGuardMiddleware.handle(["ADMIN"]),
+  asyncHandler(AdminListOrdersController.handle)
+);
+
+/**
+ * Endpoint para Admin atualizar o status de um pedido
+ */
+router.patch(
+  "/v1/admin/orders/:id/status",
+  authVerificationMiddleware,
+  roleGuardMiddleware.handle(["ADMIN"]),
+  asyncHandler(UpdateOrderStatusController.handle)
 );
 
 /**
