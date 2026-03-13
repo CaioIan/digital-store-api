@@ -14,6 +14,8 @@ const productResponseSchema = z
     price: z.number(),
     price_with_discount: z.number(),
     description: z.string().nullable().optional(),
+    brand: z.string().nullable().optional(),
+    gender: z.enum(["Masculino", "Feminino", "Unisex"]).nullable().optional(),
     enabled: z.boolean(),
     stock: z.number(),
     use_in_menu: z.boolean().optional(),
