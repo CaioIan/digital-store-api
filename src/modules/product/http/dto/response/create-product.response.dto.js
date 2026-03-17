@@ -15,6 +15,7 @@ const createProductResponseSchema = z.object({
   description: z.string().nullable(),
   price: z.number(),
   price_with_discount: z.number(),
+  display_order: z.number().int().nullable().optional(),
   category_ids: z.array(z.string()),
   images: z.array(
     z.object({

@@ -19,6 +19,7 @@ const productResponseSchema = z
     enabled: z.boolean(),
     stock: z.number(),
     use_in_menu: z.boolean().optional(),
+    display_order: z.number().int().nullable().optional(),
     images: z
       .array(
         z.object({
