@@ -43,6 +43,7 @@ const updateProductSchema = z
     gender: z.enum(["Masculino", "Feminino", "Unisex"]).optional(),
     price: z.number().positive("Preço deve ser positivo").optional(),
     price_with_discount: z.number().positive("Preço com desconto deve ser positivo").optional(),
+    display_order: z.number().int().min(1, "Ordem de exibição deve ser maior ou igual a 1").nullable().optional(),
     category_ids: z.array(z.uuid("Cada category_id deve ser um UUID válido")).optional(),
     images: z.array(imageSchema).optional(),
     options: z.array(optionSchema).optional(),

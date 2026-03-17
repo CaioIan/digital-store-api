@@ -78,13 +78,10 @@ module.exports = (sequelize) => {
         type: DataTypes.FLOAT,
         allowNull: false,
       },
-      brand: {
-        type: DataTypes.STRING(100),
+      display_order: {
+        type: DataTypes.INTEGER,
         allowNull: true,
-      },
-      gender: {
-        type: DataTypes.ENUM("Masculino", "Feminino", "Unisex"),
-        allowNull: true,
+        defaultValue: null,
       },
     },
     {

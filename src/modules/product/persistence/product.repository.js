@@ -128,6 +128,7 @@ class ProductRepository {
       "enabled",
       "stock",
       "use_in_menu",
+      "display_order",
     ];
     if (fields) {
       const requestedFields = fields.split(",").map((f) => f.trim());
@@ -143,7 +144,7 @@ class ProductRepository {
         { description: { [Sequelize.Op.like]: `%${match}%` } },
       ];
     }
-    
+
     // 3.1.2 Brand
     if (brand) {
       queryOptions.where.brand = brand;
@@ -223,8 +224,13 @@ class ProductRepository {
       attributes: ["id", "path", "enabled"],
     });
 
-    // 4. Ordenação global e de relações
-    queryOptions.order = [[{ model: ProductImage, as: "images" }, "id", "ASC"]];
+    // 4. Ordenação: display_order ASC (nulls last), id ASC, imagens por id
+    queryOptions.order = [
+      [Sequelize.literal("display_order IS NULL"), "ASC"],
+      ["display_order", "ASC"],
+      ["id", "ASC"],
+      [{ model: ProductImage, as: "images" }, "id", "ASC"],
+    ];
 
     const { count, rows } = await Product.findAndCountAll(queryOptions);
 
