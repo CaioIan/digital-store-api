@@ -37,7 +37,7 @@ const router = express.Router();
 
 router.post("/v1/user/login", authLimiter, loginValidator, asyncHandler(LoginController.handle));
 router.post("/v1/user/logout", asyncHandler(LogoutController.handle));
-router.get("/v1/user", createAccountLimiter, createUserValidator, asyncHandler(createUserController.handle));
+router.post("/v1/user", createAccountLimiter, createUserValidator, asyncHandler(createUserController.handle));
 
 /**
  * Rota exclusiva para Admin: Listar todos os usuários paginados.
@@ -51,7 +51,12 @@ router.get(
 
 // Rotas específicas ANTES das rotas com :id para evitar conflito
 router.get("/v1/user/profile", authVerificationMiddleware, asyncHandler(GetUserProfileController.handle));
-router.put("/v1/user/address", authVerificationMiddleware, updateUserAddressValidator, asyncHandler(UpdateUserAddressController.handle));
+router.put(
+  "/v1/user/address",
+  authVerificationMiddleware,
+  updateUserAddressValidator,
+  asyncHandler(UpdateUserAddressController.handle),
+);
 
 router.get("/v1/user/:id", authVerificationMiddleware, asyncHandler(GetUserByIdController.handle));
 router.patch(
