@@ -72,6 +72,19 @@ class UserRepository {
   }
 
   /**
+   * Busca usuários que já possem o mesmo e-mail, cpf ou telefone.
+   */
+  async findConflictingUsers(email, cpf, phone) {
+    const { Op } = require("sequelize");
+    return await User.findAll({
+      where: {
+        [Op.or]: [{ email }, { cpf }, { phone }],
+        deleted_at: null,
+      },
+    });
+  }
+
+  /**
    * Atualiza o firstname e/ou surname de um usuário.
    * Permite apenas campos permitidos (whitelist) para prevenir mass assignment.
    * @param {string} targetUserId - UUID do usuário a ser atualizado.
@@ -122,6 +135,13 @@ class UserRepository {
     }
 
     return await this.findById(userId);
+  }
+
+  /**
+   * Remove permanentemente (hard delete) um usuário.
+   */
+  async hardDelete(targetUserId) {
+    await User.destroy({ where: { id: targetUserId }, force: true });
   }
 
   /**

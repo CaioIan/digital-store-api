@@ -9,6 +9,7 @@ const DeleteUserController = require("../http/controllers/delete-user.controller
 const LogoutController = require("../http/controllers/logout.controller");
 const AdminListUsersController = require("../http/controllers/admin-list-users.controller");
 const { createUserValidator } = require("../http/validators/create-user.validator");
+const verifyEmailController = require("../http/controllers/verify-email.controller");
 
 const authVerificationMiddleware = require("../../../shared/auth/auth-verification.middleware");
 const { loginValidator } = require("../http/validators/login.validator");
@@ -38,6 +39,7 @@ const router = express.Router();
 router.post("/v1/user/login", authLimiter, loginValidator, asyncHandler(LoginController.handle));
 router.post("/v1/user/logout", asyncHandler(LogoutController.handle));
 router.post("/v1/user", createAccountLimiter, createUserValidator, asyncHandler(createUserController.handle));
+router.get("/v1/user/verify-email", asyncHandler(verifyEmailController.handle));
 
 /**
  * Rota exclusiva para Admin: Listar todos os usuários paginados.

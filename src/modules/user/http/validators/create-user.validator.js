@@ -1,4 +1,5 @@
 const { z } = require("zod");
+const { TEMPORARY_EMAIL_DOMAINS } = require("../../../../shared/constants/temporary-email-domains");
 
 /**
  * Schema Zod de validação para cadastro de usuário.
@@ -28,7 +29,16 @@ const createUserSchema = z
       .min(10, "Telefone deve ter no mínimo 10 caracteres")
       .max(15, "Telefone deve ter no máximo 15 caracteres"),
 
-    email: z.string({ required_error: "Email é obrigatório" }).email("Email inválido"),
+    email: z
+      .string({ required_error: "Email é obrigatório" })
+      .email("Email inválido")
+      .refine(
+        (email) => {
+          const domain = email.split("@")[1];
+          return !TEMPORARY_EMAIL_DOMAINS.has(domain);
+        },
+        { message: "Provedores de email temporários não são permitidos" }
+      ),
 
     password: z
       .string({ required_error: "Senha é obrigatória" })

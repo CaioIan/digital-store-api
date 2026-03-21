@@ -24,6 +24,10 @@ class LoginService {
       throw new AppError("Credenciais inválidas", 401);
     }
 
+    if (!user.is_verified) {
+      throw new AppError("Por favor, verifique seu email antes de fazer login", 401);
+    }
+
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) {
       throw new AppError("Credenciais inválidas", 401);
