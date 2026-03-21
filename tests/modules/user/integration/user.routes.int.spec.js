@@ -42,6 +42,25 @@ describe("User Routes - Character Limits Integration Tests", () => {
       expect(errors.some((e) => e.message.includes("50 caracteres"))).toBe(true); // Firstname/Surname
       expect(errors.some((e) => e.message.includes("100 caracteres"))).toBe(true); // Password
     });
+
+    it("Deve retornar 400 se o email for de um provedor temporário", async () => {
+      const invalidData = {
+        firstname: "John",
+        surname: "Doe",
+        cpf: "12345678901",
+        phone: "11999999999",
+        email: "user@fakemail.com",
+        password: "password123",
+        confirmPassword: "password123",
+      };
+
+      const response = await request(app).post("/v1/user").send(invalidData);
+
+      expect(response.status).toBe(400);
+      expect(response.body).toHaveProperty("errors");
+      const errors = response.body.errors;
+      expect(errors.some((e) => e.message.includes("Provedores de email temporários não são permitidos"))).toBe(true);
+    });
   });
 
   describe("PATCH /v1/user/:id", () => {

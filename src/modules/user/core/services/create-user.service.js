@@ -1,5 +1,7 @@
 const AppError = require("../../../../shared/errors/app-error");
 const userRepository = require("../../persistence/user.repository");
+const { generateToken } = require("../../../../shared/auth/jwt");
+const EmailProvider = require("../../../../shared/providers/email/email.provider");
 
 /**
  * Service responsável pelo cadastro de novos usuários.
@@ -31,13 +33,30 @@ class CreateUserService {
       throw new AppError("As senhas não coincidem.", 400);
     }
 
-    const userExists = await userRepository.findByEmail(email);
-    if (userExists) {
-      throw new AppError("Este usuário já está cadastrado.", 400);
+    const conflictingUsers = await userRepository.findConflictingUsers(email, cpf, phone);
+    for (const conflict of conflictingUsers) {
+      if (!conflict.is_verified) {
+        // Qualquer conta fantasma segurando o email, cpf ou telefone é deletada fisicamente (hard delete) em cascata.
+        await userRepository.hardDelete(conflict.id);
+      } else {
+        if (conflict.email === email) throw new AppError("Este usuário (e-mail) já está cadastrado.", 400);
+        if (conflict.cpf === cpf) throw new AppError("Este CPF já está cadastrado.", 400);
+        if (conflict.phone === phone) throw new AppError("Este telefone já está cadastrado.", 400);
+      }
     }
 
     const addressData = endereco ? { endereco, bairro, cidade, estado, cep, complemento } : null;
     const user = await userRepository.create({ firstname, surname, cpf, phone, email, password }, addressData);
+
+    const verificationToken = generateToken({ sub: user.id }, { expiresIn: "1h" });
+
+    try {
+      await EmailProvider.sendVerificationEmail(user.email, verificationToken);
+    } catch (error) {
+      await userRepository.hardDelete(user.id);
+      throw new AppError("Não foi possível enviar o email de verificação. Tente novamente.", 500);
+    }
+
     return user;
   }
 }

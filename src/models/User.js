@@ -60,6 +60,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      is_verified: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
       // Segurança: role não pode ser definida pelo cliente no signup público
       role: {
         type: DataTypes.ENUM("USER", "ADMIN"),

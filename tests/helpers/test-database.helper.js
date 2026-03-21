@@ -70,6 +70,7 @@ async function createTestUser(userData = {}) {
     email: `test-${Date.now()}-${Math.random().toString(36).slice(2)}@example.com`,
     password: "password123",
     role: "USER",
+    is_verified: true,
   };
 
   return await User.create({ ...defaultData, ...userData });
@@ -87,6 +88,7 @@ async function createTestAdmin(userData = {}) {
     email: `admin-${Date.now()}-${Math.random().toString(36).slice(2)}@example.com`,
     password: "admin123",
     role: "ADMIN",
+    is_verified: true,
   };
 
   return await User.create({ ...defaultData, ...userData });
