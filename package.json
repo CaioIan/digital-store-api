@@ -47,13 +47,17 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.3.13",
+    "@biomejs/biome": "^2.4.8",
     "jest": "^30.2.0",
     "nodemon": "^3.1.11",
     "sequelize-cli": "^6.6.5",
     "supertest": "^7.2.2"
   },
   "overrides": {
-    "immutable": "3.8.3"
+  "immutable": "3.8.3",
+  "editorconfig": {
+    "minimatch": "^9.0.7"
   }
+}
+
 }
