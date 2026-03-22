@@ -36,14 +36,18 @@ const { authLimiter, createAccountLimiter } = require("../../../config/rate-limi
  */
 const router = express.Router();
 
+// =========================
+// Rotas Públicas
+// =========================
 router.post("/v1/user/login", authLimiter, loginValidator, asyncHandler(LoginController.handle));
 router.post("/v1/user/logout", asyncHandler(LogoutController.handle));
 router.post("/v1/user", createAccountLimiter, createUserValidator, asyncHandler(createUserController.handle));
 router.get("/v1/user/verify-email", asyncHandler(verifyEmailController.handle));
 
-/**
- * Rota exclusiva para Admin: Listar todos os usuários paginados.
- */
+// =========================
+// Rotas de ADMIN (Protegidas)
+// =========================
+
 router.get(
   "/v1/admin/users",
   authVerificationMiddleware,
@@ -51,7 +55,9 @@ router.get(
   asyncHandler(AdminListUsersController.handle),
 );
 
-// Rotas específicas ANTES das rotas com :id para evitar conflito
+// =========================
+// Rotas Protegidas
+// =========================
 router.get("/v1/user/profile", authVerificationMiddleware, asyncHandler(GetUserProfileController.handle));
 router.put(
   "/v1/user/address",

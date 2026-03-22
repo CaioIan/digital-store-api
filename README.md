@@ -24,6 +24,19 @@ O projeto adota um padrão de **Arquitetura em Camadas (Layered Architecture)** 
 - **Repositories (`persistence/`):** Isola a comunicação direta com o ORM (Sequelize) e o banco de dados.
 - **Models (`models/`):** Definição das entidades do banco e seus relacionamentos utilizando Sequelize.
 
+### Convenção de Organização das Rotas
+
+Nos arquivos de rotas de cada módulo (`src/modules/*/routes/*.routes.js`), os endpoints estão organizados em blocos na seguinte ordem:
+
+1. **Rotas de ADMIN (Protegidas)**
+2. **Rotas Protegidas**
+3. **Rotas Públicas**
+
+Observações:
+- Nem todo módulo possui os três tipos de rota. Nesses casos, apenas os blocos existentes são mantidos.
+- Essa organização é uma convenção de legibilidade/manutenção e não altera as regras de negócio dos serviços.
+- Os blocos são identificados por comentários no código para facilitar navegação e revisão.
+
 ### Fluxo de Requisição
 
 ```mermaid

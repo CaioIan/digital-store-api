@@ -27,6 +27,9 @@ const asyncHandler = require("../../../shared/middlewares/async-handler.middlewa
  */
 const router = express.Router();
 
+// =========================
+// Rotas de ADMIN (Protegidas)
+// =========================
 router.post(
   "/v1/category",
   authVerificationMiddleware,
@@ -49,6 +52,10 @@ router.delete(
   deleteCategoryValidator,
   asyncHandler(deleteCategoryController.handle),
 );
+
+// =========================
+// Rotas Protegidas
+// =========================
 router.get(
   "/v1/category/search",
   authVerificationMiddleware,

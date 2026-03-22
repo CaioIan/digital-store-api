@@ -15,25 +15,9 @@ const { getOrderByIdValidator } = require("../http/validators/get-order-by-id.va
 
 const router = express.Router();
 
-/**
- * Endpoint para Finalizar Checkout e Criar um Pedido (Conversão de Carrinho)
- */
-router.post(
-  "/v1/orders",
-  authVerificationMiddleware,
-  createOrderValidator,
-  asyncHandler(CreateOrderController.handle)
-);
-
-/**
- * Endpoint para Listar todos os Pedidos do Usuário Autenticado
- */
-router.get(
-  "/v1/orders",
-  authVerificationMiddleware,
-  asyncHandler(ListUserOrdersController.handle)
-);
-
+// =========================
+// Rotas de ADMIN (Protegidas)
+// =========================
 /**
  * Endpoint para Admin Listar todos os Pedidos de um usuário específico
  * Requer autenticação e permissão de ADMIN.
@@ -53,6 +37,28 @@ router.patch(
   authVerificationMiddleware,
   roleGuardMiddleware.handle(["ADMIN"]),
   asyncHandler(UpdateOrderStatusController.handle)
+);
+
+// =========================
+// Rotas Protegidas
+// =========================
+/**
+ * Endpoint para Finalizar Checkout e Criar um Pedido (Conversão de Carrinho)
+ */
+router.post(
+  "/v1/orders",
+  authVerificationMiddleware,
+  createOrderValidator,
+  asyncHandler(CreateOrderController.handle)
+);
+
+/**
+ * Endpoint para Listar todos os Pedidos do Usuário Autenticado
+ */
+router.get(
+  "/v1/orders",
+  authVerificationMiddleware,
+  asyncHandler(ListUserOrdersController.handle)
 );
 
 /**
