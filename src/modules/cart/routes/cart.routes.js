@@ -24,6 +24,9 @@ const { removeCartItemValidator } = require("../http/validators/remove-cart-item
  */
 const router = express.Router();
 
+// =========================
+// Rotas Protegidas
+// =========================
 router.get(
   "/v1/cart",
   authVerificationMiddleware,

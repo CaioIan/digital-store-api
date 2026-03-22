@@ -30,6 +30,9 @@ const asyncHandler = require("../../../shared/middlewares/async-handler.middlewa
  */
 const router = express.Router();
 
+// =========================
+// Rotas de ADMIN (Protegidas)
+// =========================
 router.post(
   "/v1/product",
   authVerificationMiddleware,
@@ -45,8 +48,6 @@ router.post(
   uploadImageValidator,
   asyncHandler(UploadImageController.handle),
 );
-router.get("/v1/product/search", searchProductValidator, asyncHandler(SearchProductController.handle));
-router.get("/v1/product/:id", getProductByIdValidator, asyncHandler(GetProductByIdController.handle));
 router.patch(
   "/v1/product/:id",
   authVerificationMiddleware,
@@ -61,5 +62,11 @@ router.delete(
   deleteProductValidator,
   asyncHandler(DeleteProductController.handle),
 );
+
+// =========================
+// Rotas Públicas
+// =========================
+router.get("/v1/product/search", searchProductValidator, asyncHandler(SearchProductController.handle));
+router.get("/v1/product/:id", getProductByIdValidator, asyncHandler(GetProductByIdController.handle));
 
 module.exports = router;
