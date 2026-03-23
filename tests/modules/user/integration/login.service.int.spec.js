@@ -1,8 +1,12 @@
 // Testes de integração para login.service.js
 
+jest.mock("../../../../src/shared/providers/email/email.provider", () => ({
+  sendVerificationEmail: jest.fn().mockResolvedValue(true),
+}));
+
 const loginService = require("../../../../src/modules/user/core/services/login.service");
 const createUserService = require("../../../../src/modules/user/core/services/create-user.service");
-const { setupTestDatabase, clearTestDatabase } = require("../../../helpers/test-database.helper");
+const { setupTestDatabase, clearTestDatabase, User } = require("../../../helpers/test-database.helper");
 
 describe("LoginService - Integration Tests", () => {
   beforeAll(async () => {
@@ -27,6 +31,7 @@ describe("LoginService - Integration Tests", () => {
     it("deve realizar login com sucesso com credenciais válidas", async () => {
       // Primeiro cria o usuário
       await createUserService.execute(validUserData);
+      await User.update({ is_verified: true }, { where: { email: validUserData.email } });
 
       // Realiza login
       const result = await loginService.execute({
@@ -43,6 +48,7 @@ describe("LoginService - Integration Tests", () => {
 
     it("deve retornar um token JWT válido", async () => {
       await createUserService.execute(validUserData);
+      await User.update({ is_verified: true }, { where: { email: validUserData.email } });
 
       const result = await loginService.execute({
         email: validUserData.email,
@@ -65,6 +71,7 @@ describe("LoginService - Integration Tests", () => {
 
     it("deve lançar erro quando a senha está incorreta", async () => {
       await createUserService.execute(validUserData);
+      await User.update({ is_verified: true }, { where: { email: validUserData.email } });
 
       await expect(
         loginService.execute({

@@ -105,6 +105,7 @@ class ProductRepository {
       include: [],
       distinct: true,
     };
+    let hasDisplayOrderInProjection = true;
 
     // 1. Paginação
     const safeLimit = parseInt(limit, 10) || 12;
@@ -134,6 +135,7 @@ class ProductRepository {
       const requestedFields = fields.split(",").map((f) => f.trim());
       if (!requestedFields.includes("id")) requestedFields.unshift("id");
       queryOptions.attributes = requestedFields;
+      hasDisplayOrderInProjection = requestedFields.includes("display_order");
     }
 
     // 3. Filtros
@@ -225,12 +227,19 @@ class ProductRepository {
     });
 
     // 4. Ordenação: display_order ASC (nulls last), id ASC, imagens por id
-    queryOptions.order = [
-      [Sequelize.literal("display_order IS NULL"), "ASC"],
-      ["display_order", "ASC"],
-      ["id", "ASC"],
-      [{ model: ProductImage, as: "images" }, "id", "ASC"],
-    ];
+    if (hasDisplayOrderInProjection) {
+      queryOptions.order = [
+        [Sequelize.literal("display_order IS NULL"), "ASC"],
+        ["display_order", "ASC"],
+        ["id", "ASC"],
+        [{ model: ProductImage, as: "images" }, "id", "ASC"],
+      ];
+    } else {
+      queryOptions.order = [
+        ["id", "ASC"],
+        [{ model: ProductImage, as: "images" }, "id", "ASC"],
+      ];
+    }
 
     const { count, rows } = await Product.findAndCountAll(queryOptions);
 

@@ -1,5 +1,6 @@
 const request = require("supertest");
 const express = require("express");
+const cookieParser = require("cookie-parser");
 const { generateToken } = require("../../../../src/shared/auth/jwt");
 const { Product, Category, ProductOption, sequelize } = require("../../../../src/models");
 const productRoutes = require("../../../../src/modules/product/routes/product.routes");
@@ -7,6 +8,7 @@ const productRoutes = require("../../../../src/modules/product/routes/product.ro
 // Setup express app
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 app.use(productRoutes);
 const errorHandler = require("../../../../src/shared/middlewares/error-handler.middleware");
 app.use(errorHandler);
@@ -74,7 +76,7 @@ describe("Update Product - Integration Tests", () => {
 
     const response = await request(app)
       .patch(`/v1/product/${testProduct.id}`)
-      .set("Authorization", `Bearer ${token}`)
+      .set("Cookie", `access_token=${token}`)
       .send(updatePayload);
 
     expect(response.status).toBe(200);
@@ -96,7 +98,7 @@ describe("Update Product - Integration Tests", () => {
 
     const response = await request(app)
       .patch(`/v1/product/${testProduct.id}`)
-      .set("Authorization", `Bearer ${token}`)
+      .set("Cookie", `access_token=${token}`)
       .send(updatePayload);
 
     expect(response.status).toBe(200);
@@ -114,7 +116,7 @@ describe("Update Product - Integration Tests", () => {
 
     const response = await request(app)
       .patch(`/v1/product/${testProduct.id}`)
-      .set("Authorization", `Bearer ${token}`)
+      .set("Cookie", `access_token=${token}`)
       .send(updatePayload);
 
     expect(response.status).toBe(403);
@@ -136,7 +138,7 @@ describe("Update Product - Integration Tests", () => {
 
     const response = await request(app)
       .patch(`/v1/product/${testProduct.id}`)
-      .set("Authorization", `Bearer ${token}`)
+      .set("Cookie", `access_token=${token}`)
       .send(updatePayload);
 
     expect(response.status).toBe(400);
@@ -156,7 +158,7 @@ describe("Update Product - Integration Tests", () => {
 
     const response = await request(app)
       .patch(`/v1/product/${testProduct.id}`)
-      .set("Authorization", `Bearer ${token}`)
+      .set("Cookie", `access_token=${token}`)
       .send(updatePayload);
 
     expect(response.status).toBe(400);
@@ -171,7 +173,7 @@ describe("Update Product - Integration Tests", () => {
 
     const response = await request(app)
       .patch(`/v1/product/${testProduct.id}`)
-      .set("Authorization", `Bearer ${token}`)
+      .set("Cookie", `access_token=${token}`)
       .send(updatePayload);
 
     expect(response.status).toBe(400);
@@ -186,7 +188,7 @@ describe("Update Product - Integration Tests", () => {
 
     const response = await request(app)
       .patch(`/v1/product/${testProduct.id}`)
-      .set("Authorization", `Bearer ${token}`)
+      .set("Cookie", `access_token=${token}`)
       .send(updatePayload);
 
     expect(response.status).toBe(400);
@@ -206,7 +208,7 @@ describe("Update Product - Integration Tests", () => {
 
     const response = await request(app)
       .patch(`/v1/product/${nonExistentId}`)
-      .set("Authorization", `Bearer ${token}`)
+      .set("Cookie", `access_token=${token}`)
       .send(updatePayload);
 
     // Initial implementation logic might throw error or return 404/400 depending on service/repo.
@@ -222,7 +224,7 @@ describe("Update Product - Integration Tests", () => {
 
     const response = await request(app)
       .patch(`/v1/product/abc`)
-      .set("Authorization", `Bearer ${token}`)
+      .set("Cookie", `access_token=${token}`)
       .send(updatePayload);
 
     expect(response.status).toBe(400);
@@ -245,7 +247,7 @@ describe("Update Product - Integration Tests", () => {
 
     const response = await request(app)
       .patch(`/v1/product/${testProduct.id}`)
-      .set("Authorization", `Bearer ${token}`)
+      .set("Cookie", `access_token=${token}`)
       .send({ options: newOptions });
 
     expect(response.status).toBe(200);
@@ -265,7 +267,7 @@ describe("Update Product - Integration Tests", () => {
 
     const response = await request(app)
       .patch(`/v1/product/${testProduct.id}`)
-      .set("Authorization", `Bearer ${token}`)
+      .set("Cookie", `access_token=${token}`)
       .send({ category_ids: [newCategory.id] });
 
     expect(response.status).toBe(200);
@@ -300,7 +302,7 @@ describe("Update Product - Integration Tests", () => {
 
     const response = await request(app)
       .patch(`/v1/product/${testProduct.id}`)
-      .set("Authorization", `Bearer ${token}`)
+      .set("Cookie", `access_token=${token}`)
       .send(updatePayload);
 
     expect(response.status).toBe(400);

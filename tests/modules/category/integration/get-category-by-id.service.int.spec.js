@@ -1,5 +1,6 @@
 const request = require("supertest");
 const express = require("express");
+const cookieParser = require("cookie-parser");
 const { generateToken } = require("../../../../src/shared/auth/jwt");
 const { Category, sequelize } = require("../../../../src/models");
 const categoryRoutes = require("../../../../src/modules/category/routes/category.routes");
@@ -7,6 +8,7 @@ const categoryRoutes = require("../../../../src/modules/category/routes/category
 // Setup da aplicação Express para o teste
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 app.use(categoryRoutes);
 const errorHandler = require("../../../../src/shared/middlewares/error-handler.middleware");
 app.use(errorHandler);
@@ -52,7 +54,7 @@ describe("Get Category By Id - Integration Tests", () => {
 
     const response = await request(app)
       .get(`/v1/category/${createdCategory.id}`)
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", `access_token=${token}`);
 
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty("id", createdCategory.id);
@@ -71,7 +73,7 @@ describe("Get Category By Id - Integration Tests", () => {
 
     const response = await request(app)
       .get(`/v1/category/${createdCategory.id}`)
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", `access_token=${token}`);
 
     expect(response.status).toBe(200);
     expect(response.body.id).toBe(createdCategory.id);
@@ -82,7 +84,7 @@ describe("Get Category By Id - Integration Tests", () => {
     const token = generateToken(userPayload);
     const nonExistentId = "00000000-0000-4000-a000-000000000000";
 
-    const response = await request(app).get(`/v1/category/${nonExistentId}`).set("Authorization", `Bearer ${token}`);
+    const response = await request(app).get(`/v1/category/${nonExistentId}`).set("Cookie", `access_token=${token}`);
 
     expect(response.status).toBe(404);
     expect(response.body).toHaveProperty("message", "Recurso não encontrado.");
@@ -91,7 +93,7 @@ describe("Get Category By Id - Integration Tests", () => {
   it("GET /v1/category/:id - Deve retornar 400 quando o ID não é um UUID válido", async () => {
     const token = generateToken(userPayload);
 
-    const response = await request(app).get("/v1/category/invalid-id").set("Authorization", `Bearer ${token}`);
+    const response = await request(app).get("/v1/category/invalid-id").set("Cookie", `access_token=${token}`);
 
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty("errors");
@@ -109,7 +111,7 @@ describe("Get Category By Id - Integration Tests", () => {
   it("GET /v1/category/:id - Deve retornar 401 se enviar token inválido", async () => {
     const response = await request(app)
       .get(`/v1/category/${createdCategory.id}`)
-      .set("Authorization", "Bearer token-invalido-123");
+      .set("Cookie", "access_token=token-invalido-123");
 
     expect(response.status).toBe(401);
     expect(response.body).toHaveProperty("error");

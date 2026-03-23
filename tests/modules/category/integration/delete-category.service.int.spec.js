@@ -1,11 +1,13 @@
 const request = require("supertest");
 const express = require("express");
+const cookieParser = require("cookie-parser");
 const { generateToken } = require("../../../../src/shared/auth/jwt");
 const { Category, sequelize } = require("../../../../src/models");
 const categoryRoutes = require("../../../../src/modules/category/routes/category.routes");
 
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 app.use(categoryRoutes);
 const errorHandler = require("../../../../src/shared/middlewares/error-handler.middleware");
 app.use(errorHandler);
@@ -52,7 +54,7 @@ describe("Delete Category - Integration Tests", () => {
     const category = await createCategory();
     const token = generateToken(adminPayload);
 
-    const response = await request(app).delete(`/v1/category/${category.id}`).set("Authorization", `Bearer ${token}`);
+    const response = await request(app).delete(`/v1/category/${category.id}`).set("Cookie", `access_token=${token}`);
 
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty("id", category.id);
@@ -74,7 +76,7 @@ describe("Delete Category - Integration Tests", () => {
     const category = await createCategory();
     const token = generateToken(userPayload);
 
-    const response = await request(app).delete(`/v1/category/${category.id}`).set("Authorization", `Bearer ${token}`);
+    const response = await request(app).delete(`/v1/category/${category.id}`).set("Cookie", `access_token=${token}`);
 
     expect(response.status).toBe(403);
     expect(response.body).toHaveProperty("error");
@@ -102,7 +104,7 @@ describe("Delete Category - Integration Tests", () => {
 
     const response = await request(app)
       .delete(`/v1/category/${category.id}`)
-      .set("Authorization", "Bearer token-invalido-malformado");
+      .set("Cookie", "access_token=token-invalido-malformado");
 
     expect(response.status).toBe(401);
 
@@ -116,7 +118,7 @@ describe("Delete Category - Integration Tests", () => {
 
     const response = await request(app)
       .delete("/v1/category/id-invalido-nao-uuid")
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", `access_token=${token}`);
 
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty("errors");
@@ -127,7 +129,7 @@ describe("Delete Category - Integration Tests", () => {
     const token = generateToken(adminPayload);
     const fakeId = "00000000-0000-0000-0000-000000000000";
 
-    const response = await request(app).delete(`/v1/category/${fakeId}`).set("Authorization", `Bearer ${token}`);
+    const response = await request(app).delete(`/v1/category/${fakeId}`).set("Cookie", `access_token=${token}`);
 
     expect(response.status).toBe(404);
     expect(response.body.message).toMatch(/não encontrado/i);
@@ -140,14 +142,14 @@ describe("Delete Category - Integration Tests", () => {
     // Primeira deleção - sucesso
     const firstResponse = await request(app)
       .delete(`/v1/category/${category.id}`)
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", `access_token=${token}`);
 
     expect(firstResponse.status).toBe(200);
 
     // Segunda deleção - deve falhar (já soft-deletada, findById não encontra)
     const secondResponse = await request(app)
       .delete(`/v1/category/${category.id}`)
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", `access_token=${token}`);
 
     expect(secondResponse.status).toBe(404);
     expect(secondResponse.body.message).toMatch(/não encontrado/i);
@@ -159,7 +161,7 @@ describe("Delete Category - Integration Tests", () => {
 
     const response = await request(app)
       .delete(`/v1/category/${category.id}`)
-      .set("Authorization", `Bearer ${token}`)
+      .set("Cookie", `access_token=${token}`)
       .send({ name: "Hackeado", extra_field: "malicioso", role: "ADMIN" });
 
     expect(response.status).toBe(200);

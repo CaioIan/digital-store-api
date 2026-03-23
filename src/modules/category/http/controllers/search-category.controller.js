@@ -90,7 +90,8 @@ class SearchCategoryController {
    * @returns {Promise<void>} Resposta JSON com lista paginada de categorias (200).
    */
   async handle(req, res) {
-    const result = await SearchCategoryService.execute(req.query);
+    const params = res.locals.searchCategoryParams || req.query;
+    const result = await SearchCategoryService.execute(params);
     return res.status(200).json(SearchCategoryResponseDto.toResponse(result));
   }
 }

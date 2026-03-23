@@ -14,7 +14,7 @@ it("PATCH /v1/product/:id - Deve atualizar opções do produto com sucesso", asy
 
   const response = await request(app)
     .patch(`/v1/product/${testProduct.id}`)
-    .set("Authorization", `Bearer ${token}`)
+    .set("Cookie", `access_token=${token}`)
     .send({ options: newOptions });
 
   expect(response.status).toBe(200);
@@ -38,7 +38,7 @@ it("PATCH /v1/product/:id - Deve atualizar categorias do produto com sucesso", a
 
   const response = await request(app)
     .patch(`/v1/product/${testProduct.id}`)
-    .set("Authorization", `Bearer ${token}`)
+    .set("Cookie", `access_token=${token}`)
     .send({ category_ids: [newCategory.id] });
 
   expect(response.status).toBe(200);
