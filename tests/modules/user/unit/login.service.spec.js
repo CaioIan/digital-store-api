@@ -27,6 +27,7 @@ describe("LoginService - Unit Tests", () => {
     surname: "Doe",
     email: "john.doe@example.com",
     password: "$2b$10$hashedpassword",
+    is_verified: true,
     role: "USER",
   };
 
