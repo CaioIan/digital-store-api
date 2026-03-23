@@ -2,8 +2,31 @@ const ListUserOrdersService = require("../../core/services/list-user-orders.serv
 const ListUserOrdersResponseDto = require("../dto/list-user-orders.response.dto");
 
 /**
- * Controller para listagem de pedidos do usuário autenticado.
- * Recebe a requisição (com token validado) e extrai os parâmetros de paginação.
+ * @swagger
+ * /v1/orders:
+ *   get:
+ *     summary: Lista os pedidos do usuário autenticado
+ *     description: Retorna uma lista paginada de todos os pedidos realizados pelo usuário logado.
+ *     tags:
+ *       - Pedidos
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 15
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *     responses:
+ *       200:
+ *         description: Lista de pedidos retornada com sucesso
+ *       401:
+ *         description: Não autenticado
  */
 class ListUserOrdersController {
   /**

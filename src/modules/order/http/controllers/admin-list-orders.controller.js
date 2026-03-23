@@ -2,8 +2,38 @@ const ListAllOrdersService = require("../../core/services/admin-list-orders.serv
 const ListUserOrdersResponseDto = require("../dto/list-user-orders.response.dto");
 
 /**
- * Controller para listagem de pedidos (Restrito ao ADMIN).
- * Pode listar todos os pedidos do sistema ou filtrar por um usuário específico via query string.
+ * @swagger
+ * /v1/admin/orders:
+ *   get:
+ *     summary: Lista todos os pedidos do sistema (Admin)
+ *     description: Retorna uma lista paginada de todos os pedidos. Permite filtrar por um usuário específico.
+ *     tags:
+ *       - Admin
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: userId
+ *         schema:
+ *           type: string
+ *         description: Opcional. ID do usuário para filtrar os pedidos.
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 15
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *     responses:
+ *       200:
+ *         description: Lista de pedidos retornada com sucesso
+ *       401:
+ *         description: Não autenticado
+ *       403:
+ *         description: Acesso negado
  */
 class AdminListOrdersController {
   /**
