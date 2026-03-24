@@ -2,6 +2,8 @@ const AppError = require("../../../../shared/errors/app-error");
 const userRepository = require("../../persistence/user.repository");
 const { generateToken } = require("../../../../shared/auth/jwt");
 const EmailProvider = require("../../../../shared/providers/email/email.provider");
+const { isEmailVerificationEnabled } = require("../../../../shared/config/email.config");
+const { User } = require("../../../../models");
 
 /**
  * Service responsável pelo cadastro de novos usuários.
@@ -12,6 +14,12 @@ class CreateUserService {
    * Registra um novo usuário após validações.
    * O campo 'role' nunca é aceito de entrada externa — é sempre definido
    * como 'USER' na camada de repositório para prevenir escalação de privilégios.
+   *
+   * FEATURE FLAG: EMAIL_VERIFICATION_ENABLED
+   * - Se true (produção): Retorna { user, message: "Email enviado..." }
+   * - Se false (demonstração): Retorna { user } sem message
+   * O frontend detecta automaticamente o modo observando a presença de `message`.
+   *
    * @param {Object} data - Dados de cadastro.
    * @param {string} data.firstname - Primeiro nome do usuário.
    * @param {string} data.surname - Sobrenome do usuário.
@@ -25,10 +33,24 @@ class CreateUserService {
    * @param {string} [data.cidade] - Cidade de entrega.
    * @param {string} [data.cep] - CEP de entrega.
    * @param {string} [data.complemento] - Complemento do endereço.
-   * @returns {Promise<Object>} O registro do usuário criado.
+   * @returns {Promise<Object>} { user, message? } - user sempre presente, message opcional.
    * @throws {AppError} 400 - Se as senhas não coincidem ou e-mail já está cadastrado.
    */
-  async execute({ firstname, surname, cpf, phone, email, password, confirmPassword, endereco, bairro, cidade, estado, cep, complemento }) {
+  async execute({
+    firstname,
+    surname,
+    cpf,
+    phone,
+    email,
+    password,
+    confirmPassword,
+    endereco,
+    bairro,
+    cidade,
+    estado,
+    cep,
+    complemento,
+  }) {
     if (password !== confirmPassword) {
       throw new AppError("As senhas não coincidem.", 400);
     }
@@ -48,16 +70,29 @@ class CreateUserService {
     const addressData = endereco ? { endereco, bairro, cidade, estado, cep, complemento } : null;
     const user = await userRepository.create({ firstname, surname, cpf, phone, email, password }, addressData);
 
-    const verificationToken = generateToken({ sub: user.id }, { expiresIn: "1h" });
+    // Feature Flag: Se verificação de email está desabilitada, criar usuário já verificado
+    if (!isEmailVerificationEnabled()) {
+      await User.update({ is_verified: true }, { where: { id: user.id } });
+      user.is_verified = true; // Atualizar objeto local para refletir a mudança
 
-    try {
-      await EmailProvider.sendVerificationEmail(user.email, verificationToken);
-    } catch (error) {
-      await userRepository.hardDelete(user.id);
-      throw new AppError("Não foi possível enviar o email de verificação. Tente novamente.", 500);
+      return { user }; // Sem message indica que verificação está desabilitada
+    } else {
+      // Fluxo normal: enviar email de verificação e exigir confirmação
+      const verificationToken = generateToken({ sub: user.id }, { expiresIn: "1h" });
+
+      try {
+        await EmailProvider.sendVerificationEmail(user.email, verificationToken);
+      } catch (error) {
+        await userRepository.hardDelete(user.id);
+        throw new AppError("Não foi possível enviar o email de verificação. Tente novamente.", 500);
+      }
+
+      // Retorna com message quando verificação está habilitada
+      return {
+        user,
+        message: `Email de verificação enviado para ${user.email}. Por favor, clique no link recebido para ativar sua conta.`,
+      };
     }
-
-    return user;
   }
 }
 

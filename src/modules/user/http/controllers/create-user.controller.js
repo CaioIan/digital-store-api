@@ -119,6 +119,11 @@ const CreateUserResponseDto = require("../dto/response/create-user.response.dto"
  *                         type: string
  *                         nullable: true
  *                         example: Apto 42
+ *                 message:
+ *                   type: string
+ *                   nullable: true
+ *                   description: "FEATURE FLAG: Campo presente APENAS quando EMAIL_VERIFICATION_ENABLED=true (produção). Contém mensagem informando que um email de verificação foi enviado. Quando ausente (null), significa que a verificação de email está desabilitada (modo demonstração)."
+ *                   example: "Email de verificação enviado para joao@email.com. Por favor, clique no link recebido para ativar sua conta."
  *       400:
  *         description: Dados inválidos ou senhas não conferem
  *         content:
@@ -145,17 +150,30 @@ const CreateUserResponseDto = require("../dto/response/create-user.response.dto"
 /**
  * Controller responsável por processar requisições de criação de usuário.
  * Delega a lógica de negócio ao CreateUserService e formata a resposta via DTO.
+ *
+ * FLUXO COM FEATURE FLAG:
+ * 1. CreateUserService.execute() retorna { user } ou { user, message }
+ * 2. CreateUserResponseDto.toResponse() valida e passa para o cliente
+ * 3. Frontend detecta presença de `message` para determinar modo
  */
 class CreateUserController {
   /**
    * Processa requisições POST /v1/user.
+   *
+   * RESPOSTA VARIA:
+   * - Se EMAIL_VERIFICATION_ENABLED=true:
+   *   201 { user, message: "Email enviado..." }
+   * - Se EMAIL_VERIFICATION_ENABLED=false:
+   *   201 { user } (sem message)
+   *
    * @param {import('express').Request} req - Objeto de requisição do Express.
    * @param {import('express').Response} res - Objeto de resposta do Express.
    * @returns {Promise<void>}
    */
   async handle(req, res) {
-    const user = await CreateUserService.execute(req.body);
-    return res.status(201).json(CreateUserResponseDto.toResponse(user));
+    const result = await CreateUserService.execute(req.body);
+    // result pode ser { user } ou { user, message } dependendo do EMAIL_VERIFICATION_ENABLED
+    return res.status(201).json(CreateUserResponseDto.toResponse(result));
   }
 }
 
