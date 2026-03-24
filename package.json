@@ -39,6 +39,7 @@
     "mysql2": "^3.16.1",
     "nodemailer": "^8.0.3",
     "qs": "^6.15.0",
+    "resend": "^6.9.4",
     "sequelize": "^6.37.8",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui": "^5.32.1",
@@ -54,10 +55,9 @@
     "supertest": "^7.2.2"
   },
   "overrides": {
-  "immutable": "3.8.3",
-  "editorconfig": {
-    "minimatch": "^9.0.7"
+    "immutable": "3.8.3",
+    "editorconfig": {
+      "minimatch": "^9.0.7"
+    }
   }
-}
-
 }
