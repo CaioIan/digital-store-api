@@ -7,16 +7,15 @@ const { Order, OrderItem, Cart, CartItem, Product, sequelize } = require("../../
  */
 class OrderRepository {
   /**
-   * Converte um Carrinho (Cart) em um Pedido (Order) finalizado.
-   * Realiza o cálculo de totais, cria o snapshot do pedido e seus itens, e limpa o carrinho original.
-   * Esta operação é protegida por uma transação SQL para garantir a atomicidade.
-   * @param {string} userId - UUID do usuário que está realizando a compra.
-   * @param {Object} payload - Dados de checkout fornecidos pelo frontend.
-   * @param {Object} payload.personal_info - Snapshot das informações pessoais (nome, CPF, etc).
-   * @param {Object} payload.delivery_address - Snapshot do endereço de entrega no momento da compra.
-   * @param {Object} payload.payment_info - Snapshot das informações de pagamento (ex: últimos 4 dígitos do cartão).
-   * @returns {Promise<{ order_id: string }>} Objeto contendo o UUID do pedido gerado.
-   * @throws {AppError} 400 - Se o carrinho estiver vazio ou se houver problemas de stock/disponibilidade.
+   * Finaliza uma compra: Calcula totais, salva o Pedido e os Itens copiando os dados do carrinho e limpando-o em seguida.
+   * Transacional — se qualquer passo falhar (incluindo erro de validação ou banco), a operação inteira faz rollback e o carrinho é mantido intacto.
+   * @param {string} userId - ID do usuário.
+   * @param {Object} payload - Dados complementares (personal_info, delivery_address, payment_info)
+   * @param {Object} payload.personal_info
+   * @param {Object} payload.delivery_address
+   * @param {Object} payload.payment_info
+   * @returns {Promise<{ order_id: string }>} O ID numérico gerado pelo fechamento do pedido.
+   * @throws {Error} Erro se o carrinho estiver vazio ou a persistência falhar.
    */
   async checkoutCartToOrder(userId, { personal_info, delivery_address, payment_info }) {
     const transaction = await sequelize.transaction();
@@ -119,12 +118,12 @@ class OrderRepository {
   }
 
   /**
-   * Lista pedidos do sistema com suporte a paginação e filtros.
-   * @param {Object} options - Critérios de pesquisa.
-   * @param {string} [options.userId] - Opcional. Filtra pedidos de um usuário específico.
-   * @param {number} [options.limit] - Quantidade máxima de registros retornados (default 10).
-   * @param {number} [options.page] - Número da página solicitada (default 1).
-   * @returns {Promise<{data: Array<Object>, total: number, limit: number, page: number}>} Resultado paginado com metadados.
+   * Retorna os pedidos de todos os usuários ou de um usuário específico, ordenados do mais recente para o mais antigo, com paginação.
+   * @param {Object} options - Opções de busca.
+   * @param {string} [options.userId] - Opcional: ID do usuário para filtrar.
+   * @param {number} [options.limit] - Limite de itens.
+   * @param {number} [options.page] - Página atual.
+   * @returns {Promise<{data: Array, total: number, limit: number, page: number}>} Lista de pedidos e totais.
    */
   async findAll({ userId, limit, page } = {}) {
     const safeLimit = parseInt(limit, 10) || 10;
@@ -199,10 +198,10 @@ class OrderRepository {
   }
 
   /**
-   * Localiza um pedido específico filtrando pelo seu ID e pelo ID do usuário (Garantia de Ownership).
-   * @param {string} orderId - UUID do pedido.
-   * @param {string} userId - UUID do usuário dono do pedido.
-   * @returns {Promise<Object|null>} Instância do Order com OrderItems incluídos ou null.
+   * Retorna os detalhes de um pedido.
+   * @param {string} orderId - ID ou UUID do pedido.
+   * @param {string} userId - ID do dono verificador daquele pedido (Segurança)
+   * @returns {Promise<Object|null>}
    */
   async findOrderByIdAndUser(orderId, userId) {
     return await Order.findOne({

@@ -1,20 +1,8 @@
 const ClearCartService = require("../../core/services/clear-cart.service");
 
 /**
- * @swagger
- * /v1/cart/clear:
- *   delete:
- *     summary: Limpa todo o carrinho do usuário
- *     description: Remove permanentemente todos os itens do carrinho do usuário autenticado.
- *     tags:
- *       - Carrinho
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       204:
- *         description: Carrinho limpo com sucesso
- *       401:
- *         description: Não autenticado
+ * Controller responsável por limpar todos os itens do carrinho.
+ * Extrai o userId do token JWT e delega ao serviço.
  */
 class ClearCartController {
   /**
