@@ -20,12 +20,16 @@ class EmailProvider {
     const template = require("./templates/verification")(verificationUrl);
 
     try {
-      await this.transporter.sendMail({
+      const info = await this.transporter.sendMail({
         from: '"Digital Store" <no-reply@digitalstore.com>',
         to,
         subject: "Verifique seu email - Digital Store",
         html: template,
       });
+      console.log(`[EmailProvider] Email de verificação enviado: ${info.messageId}`);
+      if (info.messageId && process.env.SMTP_HOST === 'smtp.ethereal.email') {
+        console.log(`[EmailProvider] Preview URL: ${nodemailer.getTestMessageUrl(info)}`);
+      }
       return true;
     } catch (error) {
       console.error("[EmailProvider] Erro ao enviar email de verificação:", error);
