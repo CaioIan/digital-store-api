@@ -1,53 +1,10 @@
-# Digital Store — API (Back-end)
+# Digital Store API 🛍️
 
-<div align="center">
-  <br />
+**Projeto Final - Geração Tech 3.0** 🎓
 
-  ![Node.js](https://img.shields.io/badge/Node.js-18+-339933?logo=nodedotjs&logoColor=white)
-  ![Express](https://img.shields.io/badge/Express-5-000000?logo=express&logoColor=white)
-  ![Sequelize](https://img.shields.io/badge/Sequelize-6-52B0E7?logo=sequelize&logoColor=white)
-  ![MySQL](https://img.shields.io/badge/MySQL-8-4479A1?logo=mysql&logoColor=white)
-  ![Biome](https://img.shields.io/badge/Biome-2.3-60A5FA?logo=biome&logoColor=white)
-  ![Jest](https://img.shields.io/badge/Jest-29-C21325?logo=jest&logoColor=white)
-  ![License](https://img.shields.io/badge/Licença-ISC-blue)
-</div>
+Esta API RESTful desenvolvida em Node.js é a entrega final referente ao módulo de Back-end do curso **Geração Tech 3.0**. Ela compõe o sistema de e-commerce da "Digital Store" e foi projetada para atuar em conjunto com uma **aplicação Front-end** (integração visual).
 
-<br />
-
-> [!IMPORTANT]
-> **Projeto Final — Geração Tech 3.0**
-> Este repositório contém a **API (Back-end)** da plataforma **Digital Store**, desenvolvida como **Trabalho Final do Curso** do **Geração Tech 3.0**. Trata-se do motor central que gerencia toda a lógica de negócio, persistência de dados e segurança do E-commerce.
-
----
-
-## 📦 O Ecossistema Digital Store
-
-O projeto **Digital Store** é composto por **3 repositórios independentes** que juntos formam um ecossistema completo de E-commerce:
-
-| Repositório | Descrição | Responsável por |
-|---|---|---|
-| **🔧 digital-store-api** (este repo) | API RESTful | Autenticação, CRUD de produtos, gestão de pedidos, controle de estoque, processamento de pagamentos e lógica de negócio |
-| **🖥️ digital-store-frontend** | Interface do consumidor final | Navegação de produtos, carrinho, checkout, gestão de pedidos e perfil do usuário |
-| **📊 digital-store-admin** | Painel administrativo | Cadastro/edição de produtos, gestão de categorias/marcas, visualização de pedidos e métricas do negócio |
-
-### Como os projetos se conectam
-
-```
-┌──────────────────────┐         ┌──────────────────┐         ┌──────────────────────┐
-│   Front-end Cliente  │◄───────►│    API (Back-end) │◄───────►│   Front-end Admin    │
-│                      │  HTTP   │ (Este repositório)│  HTTP   │  (Painel do Gestor)  │
-│                      │ Cookies │                   │         │                      │
-│  • Catálogo          │         │  • Auth JWT       │         │  • CRUD de Produtos  │
-│  • Carrinho          │         │  • Rotas REST     │         │  • Gestão de Pedidos │
-│  • Checkout          │         │  • Banco de Dados │         │  • Categorias/Marcas │
-│  • Meus Pedidos      │         │  • Upload Imagens │         │  • Dashboard         │
-│  • Perfil do Usuário │         │  • Validações     │         │                      │
-└──────────────────────┘         └──────────────────┘         └──────────────────────┘
-```
-
-> O **Back-end (API)** é o núcleo central que atende tanto o Front-end do Cliente quanto o Painel Admin. A autenticação é feita via **HTTP-Only Cookies** e **Bearer Tokens**, garantindo segurança e flexibilidade para as diferentes interfaces.
-
----
+API RESTful para gerenciamento e e-commerce de uma loja digital ("Digital Store").
 
 ## Descrição Geral
 
@@ -112,11 +69,8 @@ sequenceDiagram
 - **Framework principal:** Express.js `v5.x`
 - **ORM:** Sequelize `v6.x`
 - **Banco de dados:** MySQL `8.0`
-- **Biblioteca de autenticação:** `jsonwebtoken` (JWT), `bcrypt` (Hashing) & `cookie-parser`
-- **Biblioteca de envio de email:** `nodemailer`
+- **Biblioteca de autenticação:** `jsonwebtoken` (JWT) & `bcrypt` (Hashing)
 - **Biblioteca de validação:** `zod`
-- **Controle de Taxa:** `express-rate-limit`
-- **Identificadores Únicos:** `uuid`
 - **Integração de Mídia:** `cloudinary` & `multer`
 - **Documentação:** `swagger-jsdoc` & `swagger-ui-express`
 - **Testes:** `jest` e `supertest` (Cobertura Unitária e Integração)
@@ -159,7 +113,7 @@ tests/                  # Suíte de testes (Integração e Unitários organizado
 
 - **Ambiente:** Node.js (versão 18+ recomendada)
 - **Banco de Dados:** MySQL 8.0 rodando localmente (ou via Docker)
-- **Dependências Externas:** Conta no Cloudinary para realizar os uploads de imagens e serviços de terceiros para envio de e-mails.
+- **Dependências Externas:** Conta no Cloudinary para realizar os uploads de imagens.
 
 ---
 
@@ -189,26 +143,20 @@ docker-compose up -d
 
 Crie um arquivo `.env` na raiz do projeto contendo as seguintes variáveis:
 
-| Variável | Obrigatória | Exemplo | Descrição |
-|----------|-------------|---------|-----------|
-| `PORT` | Não | `3000` | Porta em que o servidor Express irá rodar |
-| `NODE_ENV` | Não | `development` | Ambiente de execução (`development`, `test`, `production`) |
-| `API_URL` | Sim | `http://localhost:3000` | URL base da API (usada para links de verificação de email) |
-| `FRONTEND_URL` | Sim | `http://localhost:5173` | URL base do Front-end (usada em configurações de CORS) |
-| `DB_USER` | Sim | `root` | Usuário do MySQL |
-| `DB_PASSWORD` | Sim | `password` | Senha do banco MySQL |
-| `DB_NAME` | Sim | `digital_store_db` | Nome do banco principal |
-| `DB_HOST` | Sim | `localhost` | Host do banco de dados |
-| `DB_PORT` | Não | `3306` | Porta do banco de dados |
-| `DB_NAME_TEST`| Sim (em Teste) | `digital_store_test` | Banco dedicado para testes |
-| `JWT_SECRET` | Sim | `suasecreta` | Chave usada para assinar tokens JWT |
-| `CLOUDINARY_CLOUD_NAME`| Sim | `nome_da_nuvem` | Identificador da conta no Cloudinary |
-| `CLOUDINARY_API_KEY`| Sim | `12345678` | Chave de API do Cloudinary |
-| `CLOUDINARY_API_SECRET`| Sim | `secret_aqui` | Segredo de API do Cloudinary |
-| `SMTP_HOST` | Sim | `smtp.ethereal.email` | Host do servidor SMTP para emails |
-| `SMTP_PORT` | Sim | `587` | Porta do servidor SMTP |
-| `SMTP_USER` | Sim | `user@email.com` | Usuário do servidor SMTP |
-| `SMTP_PASS` | Sim | `senha_smtp` | Senha do servidor SMTP |
+| Variável | Obrigatória | Descrição |
+|----------|-------------|-----------|
+| `PORT` | Não | Porta em que o servidor Express irá rodar (Padrão: 3000) |
+| `NODE_ENV` | Não | Ambiente de execução (`development`, `test`, `production`) |
+| `DB_USER` | Sim | Usuário do MySQL (ex: `usuario_app`) |
+| `DB_PASSWORD` | Sim | Senha do banco MySQL (ex: `senha_app`) |
+| `DB_NAME` | Sim | Nome do banco principal (ex: `digital_store_db`) |
+| `DB_HOST` | Sim | IP/Host do banco de dados (ex: `127.0.0.1`) |
+| `DB_PORT` | Não | Porta do banco de dados (Padrão: 3306) |
+| `DB_NAME_TEST`| Sim (em Teste) | Nome do banco dedicado para testes (ex: `digital_store_test`) |
+| `JWT_SECRET` | Sim | Chave criptográfica secreta usada para assinar e verificar tokens JWT |
+| `CLOUDINARY_CLOUD_NAME`| Sim | Nome da Cloud associada à conta no Cloudinary |
+| `CLOUDINARY_API_KEY`| Sim | Chave de API do Cloudinary para uploads de Imagem |
+| `CLOUDINARY_API_SECRET`| Sim | Secret de API do Cloudinary para validação do Upload |
 
 ---
 
@@ -250,14 +198,13 @@ OK
 ### 👤 Módulo: Usuários (Users)
 
 #### POST `/v1/user/login`
-- **Descrição:** Autentica o usuário e gera um token JWT. O token é retornado no corpo da resposta e também assinado em um cookie `access_token` HTTP-Only para maior segurança.
+- **Descrição:** Gera o token JWT para acesso às rotas protegidas (Login).
 - **Autenticação:** Não
-- **Middlewares:** `authLimiter` (Rate limit restrito para login)
 - **Body:**
 ```json
 {
   "email": "user@example.com",
-  "password": "SenhaDoUsuario"
+  "password": "MinhaSenhaSuperSecreta"
 }
 ```
 - **Response 200:**
@@ -265,25 +212,13 @@ OK
 {
   "token": "eyJhbG..",
   "user": {
-    "id": "uuid",
+    "id": "uuid-aqui",
     "firstname": "John",
     "surname": "Doe",
     "email": "user@example.com"
   }
 }
 ```
-
-#### POST `/v1/user/logout`
-- **Descrição:** Limpa o cookie de autenticação `access_token` no navegador do usuário.
-- **Autenticação:** Não (Pública)
-- **Response 204:** No Content.
-
-#### GET `/v1/user/verify-email`
-- **Descrição:** Endpoint acessado via link enviado por e-mail para validar a conta do usuário.
-- **Autenticação:** Não (Token via Query String)
-- **Parâmetros:** `token` (JWT sem estado)
-- **Response 200:** (Retorna página HTML de sucesso)
-- **Response 400:** (Retorna página HTML de erro/expiração)
 - **Erros:** `400 Bad Request` (Email/Senha inválidos) | `404 Not Found` (Usuário não existe).
 
 #### POST `/v1/user`
@@ -344,16 +279,10 @@ OK
 
 #### DELETE `/v1/user/:id`
 - **Descrição:** Realiza a exclusão lógica (Soft Delete) do usuário do sistema preenchendo o `deleted_at`.
-- **Autenticação:** Sim (Cookie ou Bearer Token)
+- **Autenticação:** Sim (Bearer Token)
 - **Parâmetros de rota:** `id` (UUID)
-- **Response 204:** Sem Conteúdo (No Content).
+- **Response 204:** No Content.
 - **Erros:** `401 Unauthorized` | `404 Not Found`.
-
-#### GET `/v1/admin/users`
-- **Descrição:** Lista todos os usuários cadastrados no sistema. (Apenas para Administradores).
-- **Autenticação:** Sim (Role ADMIN)
-- **Query Params:** `limit`, `page`.
-- **Response 200:** Lista paginada de usuários.
 
 ---
 ### 🗂 Módulo: Categorias (Categories)
@@ -594,20 +523,9 @@ OK
   - `limit` (padrão: 10)
   - `page` (padrão: 1)
 
-#### GET /v1/orders/:id
+#### GET `/v1/orders/:id`
 - **Descrição:** Obtém os detalhes completos de um pedido fechado. Só permite visualização se o pedido pertencer ao usuário (ou se for papel ADMIN).
 - **Autenticação:** Sim (Bearer Token)
-
-#### GET /v1/admin/orders
-- **Descrição:** Lista todos os pedidos do sistema. (Apenas para Administradores). Pode ser filtrado por `userId` na query.
-- **Autenticação:** Sim (Role ADMIN)
-- **Response 200:** Lista paginada de todos os pedidos.
-
-#### PATCH /v1/admin/orders/:id/status
-- **Descrição:** Atualiza o status de um pedido (ex: de "PENDING" para "PAID").
-- **Autenticação:** Sim (Role ADMIN)
-- **Body:** `{"status": "PAID"}`
-- **Response 200:** Pedido atualizado.
 
 ---
 
@@ -737,39 +655,9 @@ erDiagram
 
 ## Autenticação e Autorização
 
-- **Tipo:** JWT (JSON Web Token).
-- **Armazenamento:** Os tokens são enviados pelo servidor via **HTTP-Only Cookies** (`access_token`), o que mitiga ataques de XSS (Cross-Site Scripting). A API também suporta o cabeçalho `Authorization: Bearer <Token>` por compatibilidade.
-- **Fluxo de autenticação:** O Cliente realiza login (`/v1/user/login`). A API retorna o JWT assinado e o salva no cookie. Em chamadas subsequentes, o `authVerificationMiddleware` extrai o token do cookie ou do header e valida a sessão.
-- **Fluxo de Verificação de E-mail:**
-  1. No cadastro, um usuário é criado com `is_verified: false`.
-  2. Um token JWT de curta duração (sem estado) é gerado.
-  3. Um e-mail com um link único (`/verify-email?token=...`) é enviado via Nodemailer.
-  4. Ao clicar no link, o sistema valida o token e marca o usuário como verificado.
-  5. Login só é permitido para usuários com e-mail verificado.
-- **Estratégia de autorização:** O sistema utiliza **RBAC (Role-Based Access Control)** com as roles `USER` e `ADMIN`. O middleware `roleGuardMiddleware` protege rotas administrativas, garantindo que apenas usuários com a role `ADMIN` acessem funcionalidades sensíveis.
-
----
-
-## API Rate Limiting
-
-Para garantir a disponibilidade e segurança contra ataques de força bruta ou DoS, a API utiliza diversos níveis de Rate Limiting:
-
-- **Global Limiter**: Limite de 1000 requisições a cada 15 minutos aplicado a todas as rotas de navegação.
-- **Auth Limiter**: Aplicado ao endpoint de login, limitando a 5 tentativas a cada 15 minutos por IP.
-- **Create Account Limiter**: Aplicado ao cadastro de usuários, limitando a 5 novas contas a cada 5 minutos por IP.
-
-Middlewares configurados em `src/config/rate-limit.config.js`.
-
----
-
-## Segurança (Auditoria e Boas Práticas)
-
-O projeto passou por uma auditoria de segurança focada em mitigar falhas comuns:
-
-- **Proteção contra IDOR (Insecure Direct Object Reference)**: Em rotas sensíveis como pedidos e perfil, a API verifica se o `user_id` do recurso corresponde ao `sub` do token JWT do usuário autenticado.
-- **Prevenção de Elevação de Privilégios**: As rotas de atualização de usuários monitoram campos restritos. Usuários comuns não podem alterar sua própria `role` ou de terceiros.
-- **Proteção contra Mass Assignment**: Utilização de schemas rigorosos com Zod para garantir que apenas campos permitidos (whitelist) sejam processados nas requisições de criação e atualização.
-- **Senhas Seguradas**: Hashing via `bcrypt` com rounds de salt adequados.
+- **Tipo:** JWT (JSON Web Token) via Header `Authorization: Bearer <Token>`.
+- **Fluxo de autenticação:** O Cliente realiza login (`/v1/user/login`). A API retorna o JWT assinado (`jsonwebtoken`). Em chamadas subsequentes protegidas, o `authVerificationMiddleware` valida a integridade, não-expiração e extrai o `req.user`.
+- **Estratégia de autorização:** Os usuários contam com enumeração de Roles estritas (`USER` e `ADMIN`). O Middleware **`roleGuardMiddleware`** impede clientes do tipo `USER` comum de efetuarem alterações massivas (Cadastrar Produtos, Modificar Categorias). Modificações de próprio perfil e exclusão estão acessíveis checando internamente autorizações granulares pelo UUID no próprio Controller/Service.
 
 ---
 
@@ -791,7 +679,7 @@ A API possui uma **estratégia global e unificada** via Middleware (`error-handl
 
 - Em Serviços, classes de exceção especializadas como Entidades Not-Found explodem erros conhecidos (ou status HTTP diretamente) que bolham à Camada do Express.
 - Zod Validators devolvem padronizados e interceptados o status Rest API apropriado: `400 Bad Request` com Field/Messages mapeados.
-- Se fora de Contexto Seguro: `500 Internal Server Error` (Erro Interno do Servidor) é devolvido blindando detalhes ocultos/internos na versão de Produção (StackTraces não são exibidos).
+- Se fora de Contexto Seguro: `500 Server Error Internal` é devolvido blindando detalhes ocultos/internos na versão Prod (StackTraces somem de res).
 - **Códigos Comuns:**
   - `400`: Payload falhou validações Zod ou falha lógica Negócio.
   - `401`: JWT Ausente/Expirou.
@@ -814,10 +702,10 @@ A API possui uma **estratégia global e unificada** via Middleware (`error-handl
 
 ## Segurança
 
-- **Proteção Criptográfica:** Senhas salvas via Hash `bcrypt` (`genSalt(10)`) rodando diretamente através de `hooks` (ganchos) nativos do Sequelize (estratégia de nunca expor senhas).
-- **Validações Fortes:** Validação imperativa de Request Body por Schema ZOD com `.strict()` descartando/limpando campos não permitidos (evitando mass-assignment/atribuição em massa), mitigação de poluição de parâmetros e restrição de tipagem profunda.
-- **Sanitização de Uploads:** O backend nega uploads com MimeTypes não explicitamente homologados (Anti-Webshells). Autenticação segura com serviço de CDN (Cloudinary).
-- *Rate Limiting / CORS*: Configurados globalmente para prevenir abusos e permitir integração segura com o Front-end.
+- **Proteção Criptográfica:** Salvas as senhas via Hash `bcrypt` (`genSalt(10)`) rodando diretamente de `hooks` Nativo Sequelize (Never-expose-passwords approach).
+- **Validações Fortes:** Validação imperativa Typescript-like de Request Body por Schema ZOD com `.strict()` descartando/limpando Injection via Atributos Estranhos mass-assign, mitigação de Poluição e restrição de tipagem profunda.
+- **Sanitização Básica Uploads:** O backend nega uploads com MimeTypes não explicitamente homologados (Anti-Webshells). Autentica no backend Third-Party CDN (Cloudinary).
+- *Rate Limiting / CORS*: No estado atual, configuráveis via reverse-proxy ou Ingress-controllers nas frentes Cloud Native; Código nativo sem Middlewares obstrutivos limitadores.
 
 ---
 
