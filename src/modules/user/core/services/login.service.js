@@ -2,7 +2,6 @@ const AppError = require("../../../../shared/errors/app-error");
 const bcrypt = require("bcrypt");
 const userRepository = require("../../persistence/user.repository");
 const { generateToken } = require("../../../../shared/auth/jwt");
-const { isEmailVerificationEnabled } = require("../../../../shared/config/email.config");
 
 /**
  * Service responsável pela autenticação de usuários.
@@ -25,8 +24,7 @@ class LoginService {
       throw new AppError("Credenciais inválidas", 401);
     }
 
-    // Feature Flag: Validar is_verified apenas se verificação de email estiver habilitada
-    if (isEmailVerificationEnabled() && !user.is_verified) {
+    if (!user.is_verified) {
       throw new AppError("Por favor, verifique seu email antes de fazer login", 401);
     }
 

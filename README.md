@@ -113,7 +113,7 @@ sequenceDiagram
 - **ORM:** Sequelize `v6.x`
 - **Banco de dados:** MySQL `8.0`
 - **Biblioteca de autenticação:** `jsonwebtoken` (JWT), `bcrypt` (Hashing) & `cookie-parser`
-- **Biblioteca de envio de email:** `resend` (SDK oficial do Resend)
+- **Biblioteca de envio de email:** `nodemailer`
 - **Biblioteca de validação:** `zod`
 - **Controle de Taxa:** `express-rate-limit`
 - **Identificadores Únicos:** `uuid`
@@ -128,7 +128,7 @@ sequenceDiagram
 
 ```text
 src/
- ├── config/            # Configurações gerais (Banco de Dados, Cloudinary, Swagger, Email)
+ ├── config/            # Configurações gerais (Banco de Dados, Cloudinary, Swagger)
  ├── database/          # Configuração e inicialização da conexão com o banco
  ├── models/            # Modelos do Sequelize (Entidades e Associações)
  ├── modules/           # Módulos principais (DDD-like)
@@ -141,8 +141,6 @@ src/
  │       └── routes/        # Rotas Express específicas do módulo
  ├── shared/            # Código compartilhado entre módulos
  │   ├── auth/          # Utilitários de JWT e Middlewares de autenticação
- │   ├── config/        # Configurações de features e ambiente (email.config.js)
- │   ├── providers/     # Provedores de terceiros (EmailProvider, etc)
  │   └── middlewares/   # Middlewares globais (Error Handler, Role Guard, Upload)
  └── app.js & server.js # Arquivos de inicialização e montagem do Express
 tests/                  # Suíte de testes (Integração e Unitários organizados por módulo / setup)
@@ -161,9 +159,7 @@ tests/                  # Suíte de testes (Integração e Unitários organizado
 
 - **Ambiente:** Node.js (versão 18+ recomendada)
 - **Banco de Dados:** MySQL 8.0 rodando localmente (ou via Docker)
-- **Dependências Externas:** 
-  - Conta no Cloudinary para realizar uploads de imagens
-  - Conta no Resend para envio de emails de verificação e transacionais
+- **Dependências Externas:** Conta no Cloudinary para realizar os uploads de imagens e serviços de terceiros para envio de e-mails.
 
 ---
 
@@ -209,9 +205,10 @@ Crie um arquivo `.env` na raiz do projeto contendo as seguintes variáveis:
 | `CLOUDINARY_CLOUD_NAME`| Sim | `nome_da_nuvem` | Identificador da conta no Cloudinary |
 | `CLOUDINARY_API_KEY`| Sim | `12345678` | Chave de API do Cloudinary |
 | `CLOUDINARY_API_SECRET`| Sim | `secret_aqui` | Segredo de API do Cloudinary |
-| `RESEND_API_KEY` | Sim | `re_xxxxx...` | Chave de API do serviço Resend para envio de emails |
-| `MAIL_FROM` | Sim | `Digital Store <onboarding@resend.dev>` | Email remetente para envio de mensagens |
-| `EMAIL_VERIFICATION_ENABLED` | Não | `true` | Feature flag para exigir verificação de email (`true` = produção, `false` = demonstração) |
+| `SMTP_HOST` | Sim | `smtp.ethereal.email` | Host do servidor SMTP para emails |
+| `SMTP_PORT` | Sim | `587` | Porta do servidor SMTP |
+| `SMTP_USER` | Sim | `user@email.com` | Usuário do servidor SMTP |
+| `SMTP_PASS` | Sim | `senha_smtp` | Senha do servidor SMTP |
 
 ---
 
@@ -290,7 +287,7 @@ OK
 - **Erros:** `400 Bad Request` (Email/Senha inválidos) | `404 Not Found` (Usuário não existe).
 
 #### POST `/v1/user`
-- **Descrição:** Cadastro de um novo Usuário (Role padrão: `USER`). A resposta varia baseada na feature flag `EMAIL_VERIFICATION_ENABLED`.
+- **Descrição:** Cadastro de um novo Usuário (Role padrão: `USER`).
 - **Autenticação:** Não
 - **Middlewares:** `createUserValidator`
 - **Body:**
@@ -303,36 +300,15 @@ OK
   "confirmPassword": "senha"
 }
 ```
-- **Response 201 (Modo: EMAIL_VERIFICATION_ENABLED=true):**
+- **Response 201:**
 ```json
 {
-  "user": {
-    "id": "uuid",
-    "firstname": "John",
-    "surname": "Doe",
-    "cpf": "12345678900",
-    "phone": "11999999999",
-    "email": "john.doe@example.com",
-    "addresses": []
-  },
-  "message": "Email de verificação enviado para john.doe@example.com. Por favor, clique no link recebido para ativar sua conta."
+  "id": "uuid",
+  "firstname": "John",
+  "surname": "Doe",
+  "email": "john.doe@example.com"
 }
 ```
-- **Response 201 (Modo: EMAIL_VERIFICATION_ENABLED=false):**
-```json
-{
-  "user": {
-    "id": "uuid",
-    "firstname": "John",
-    "surname": "Doe",
-    "cpf": "12345678900",
-    "phone": "11999999999",
-    "email": "john.doe@example.com",
-    "addresses": []
-  }
-}
-```
-- **Detectando o Modo no Frontend:** Se a resposta contém campo `message`, significa que a verificação de email está habilitada. Se não contém, está desabilitada.
 - **Erros:** `400 Bad Request` (Senhas não colidem, dados faltantes) | `409 Conflict` (Email já existente).
 
 #### GET `/v1/user/:id`
@@ -765,330 +741,12 @@ erDiagram
 - **Armazenamento:** Os tokens são enviados pelo servidor via **HTTP-Only Cookies** (`access_token`), o que mitiga ataques de XSS (Cross-Site Scripting). A API também suporta o cabeçalho `Authorization: Bearer <Token>` por compatibilidade.
 - **Fluxo de autenticação:** O Cliente realiza login (`/v1/user/login`). A API retorna o JWT assinado e o salva no cookie. Em chamadas subsequentes, o `authVerificationMiddleware` extrai o token do cookie ou do header e valida a sessão.
 - **Fluxo de Verificação de E-mail:**
-  - **Modo Normal (EMAIL_VERIFICATION_ENABLED=true):**
-    1. No cadastro, um usuário é criado com `is_verified: false`.
-    2. Um token JWT de curta duração (sem estado) é gerado.
-    3. Um e-mail com um link único (`/verify-email?token=...`) é enviado via Resend.
-    4. Ao clicar no link, o sistema valida o token e marca o usuário como verificado.
-    5. Login só é permitido para usuários com e-mail verificado.
-  - **Modo Demonstração (EMAIL_VERIFICATION_ENABLED=false):**
-    1. No cadastro, um usuário é criado com `is_verified: true` automaticamente.
-    2. Nenhum email de verificação é enviado.
-    3. Login é permitido imediatamente sem necessidade de verificação.
-    4. Útil para ambientes de demonstração/teste não-produtivos.
-  - **Configuração:** A feature é controlada pela variável de ambiente `EMAIL_VERIFICATION_ENABLED`:
-    - `true` (padrão): Exigir verificação de email → Use em produção.
-    - `false`: Desabilitar verificação → Use em demonstrações (ex: Vercel demo).
+  1. No cadastro, um usuário é criado com `is_verified: false`.
+  2. Um token JWT de curta duração (sem estado) é gerado.
+  3. Um e-mail com um link único (`/verify-email?token=...`) é enviado via Nodemailer.
+  4. Ao clicar no link, o sistema valida o token e marca o usuário como verificado.
+  5. Login só é permitido para usuários com e-mail verificado.
 - **Estratégia de autorização:** O sistema utiliza **RBAC (Role-Based Access Control)** com as roles `USER` e `ADMIN`. O middleware `roleGuardMiddleware` protege rotas administrativas, garantindo que apenas usuários com a role `ADMIN` acessem funcionalidades sensíveis.
-
----
-
-## Feature Flags
-
-O sistema implementa feature flags para permitir diferentes comportamentos em ambientes distintos sem duplicação de código.
-
-### Email Verification Flag (`EMAIL_VERIFICATION_ENABLED`)
-
-#### 📌 Contexto e Objetivo
-
-A verificação de email é um componente crítico de segurança que garante que os usuários controlam endereços de email válidos. No entanto, em certos cenários, como **demonstrações de produto** ou **avaliações acadêmicas**, o fluxo completo de verificação por email pode não ser viável porque:
-
-1. **Limitações de Email em Dev:** Serviços de email em teste (como Resend `onboarding@resend.dev`) só entregam emails para a conta registrada
-2. **Avaliadores Externas:** Professores/avaliadores não podem receber emails de verificação do sistema
-3. **Experiência UX:** Demonstração fica mais fluida sem barreiras de email
-
-**Solução:** Feature flag que permite a mesma aplicação rodar em dois modos:
-- ✅ **Produção/Dev:** Com verificação de email (seguro)
-- ✅ **Demonstração:** Sem verificação de email (rápido)
-
----
-
-#### 🔧 Como Funciona
-
-A feature flag é controlada pela variável de ambiente `EMAIL_VERIFICATION_ENABLED`:
-
-```bash
-EMAIL_VERIFICATION_ENABLED=true   # Modo: Com verificação (padrão/seguro)
-EMAIL_VERIFICATION_ENABLED=false  # Modo: Sem verificação (demonstração)
-```
-
----
-
-#### 💡 Modo Produção (`EMAIL_VERIFICATION_ENABLED=true`)
-
-**Quando usar:** Ambiente de desenvolvimento local, staging e produção
-
-**Comportamento:**
-
-| Ação | O Que Acontece |
-|------|---|
-| Cadastro do usuário | Usuário criado com `is_verified: false` |
-| Email | Email de verificação enviado via Resend |
-| Login antes de verificar | ❌ Bloqueado (erro 401: "Verifique seu email") |
-| Usuário clica link do email | Endpoint `/verify-email?token=...` marca como verificado |
-| Login após verificação | ✅ Permitido com sucesso |
-
-**Exemplo de Fluxo:**
-```
-1. POST /v1/user (com EMAIL_VERIFICATION_ENABLED=true)
-   ├─ Retorna: { user, message: "Email enviado para..." }
-   ├─ Database: user.is_verified = false
-   └─ Email: Enviado via Resend
-
-2. Usuário clica link do email
-   └─ GET /v1/user/verify-email?token=JWT_TOKEN
-      └─ Database: user.is_verified = true
-
-3. POST /v1/user/login
-   └─ Verificação de is_verified: true ✅ Permite login
-```
-
-**Configuração:**
-```bash
-# .env
-EMAIL_VERIFICATION_ENABLED=true
-RESEND_API_KEY=re_xxxxx...
-MAIL_FROM=Digital Store <seu_email@dominio.com>
-```
-
----
-
-#### 🚀 Modo Demonstração (`EMAIL_VERIFICATION_ENABLED=false`)
-
-**Quando usar:** Avaliação/demonstração pública (ex: professor, cliente)
-
-**Comportamento:**
-
-| Ação | O Que Acontece |
-|------|---|
-| Cadastro do usuário | Usuário criado com `is_verified: true` (já verificado!) |
-| Email | ❌ NÃO é enviado |
-| Login imediato | ✅ Permitido logo após cadastro |
-| Endpoint de verificação | Retorna página informativa: "Já verificado" |
-
-**Exemplo de Fluxo:**
-```
-1. POST /v1/user (com EMAIL_VERIFICATION_ENABLED=false)
-   ├─ Retorna: { user } (SEM message)
-   ├─ Database: user.is_verified = true
-   └─ Email: NÃO é enviado
-
-2. POST /v1/user/login
-   ├─ Pula validação de is_verified (porque flag é false)
-   └─ ✅ Login permitido imediatamente
-```
-
-**Configuração:**
-```bash
-# .env ou Environment Variables (Vercel)
-EMAIL_VERIFICATION_ENABLED=false
-RESEND_API_KEY=re_xxxxx...
-MAIL_FROM=Digital Store <onboarding@resend.dev>
-```
-
----
-
-#### 🎯 Detecção Automática no Frontend
-
-O frontend detecta **automaticamente** qual modo está ativo observando a resposta da API:
-
-```javascript
-// Frontend observa a resposta de POST /v1/user
-const { user, message } = response.data
-const emailVerificationRequired = !!message
-
-if (emailVerificationRequired) {
-  // Mode: COM verificação (true)
-  // → Mostra: "Email enviado para seu inbox"
-  // → Navega para: /verify-email-sent
-  // → Aguarda: Clique do usuario no link do email
-} else {
-  // Mode: SEM verificação (false)
-  // → Mostra: "Conta criada com sucesso!"
-  // → Navega para: /login (direto!)
-  // → Sem aguardar: Email
-}
-```
-
-**Padrão de Resposta:**
-
-Modo COM verificação:
-```json
-Status: 201 Created
-{
-  "user": {
-    "id": "550e8400-e29b-41d4-a716-446655440000",
-    "firstname": "João",
-    "email": "joao@example.com",
-    "is_verified": false
-  },
-  "message": "Email de verificação enviado para joao@example.com. Por favor, clique no link recebido para ativar sua conta."
-}
-```
-
-Modo SEM verificação:
-```json
-Status: 201 Created
-{
-  "user": {
-    "id": "550e8400-e29b-41d4-a716-446655440000",
-    "firstname": "João",
-    "email": "joao@example.com",
-    "is_verified": true
-  }
-}
-```
-
-**⚠️ Nota:** A presença do campo `message` é o **indicador da feature flag**. Sem `message` = verificação desabilitada.
-
----
-
-#### 🏗️ Implementação Técnica
-
-**Arquivo responsável:** `src/shared/config/email.config.js`
-
-```javascript
-function isEmailVerificationEnabled() {
-  const flag = process.env.EMAIL_VERIFICATION_ENABLED
-  
-  if (flag === undefined) {
-    console.warn("[EmailConfig] Default: true (verificação obrigatória)")
-    return true  // Seguro por padrão
-  }
-  
-  // Converte "true"/"false" string para boolean
-  return ["true", "1", "yes"].includes(String(flag).toLowerCase())
-}
-```
-
-**Locais onde a flag é usada:**
-
-1. **CreateUserService** (`src/modules/user/core/services/create-user.service.js`)
-   - Se `true`: Envia email e retorna com `message`
-   - Se `false`: Não envia email, retorna sem `message`
-
-2. **LoginService** (`src/modules/user/core/services/login.service.js`)
-   - Se `true`: Valida `is_verified` antes de fazer login
-   - Se `false`: Ignora validação de `is_verified`
-
-3. **VerifyEmailController** (`src/modules/user/http/controllers/verify-email.controller.js`)
-   - Se `true`: Valida token JWT
-   - Se `false`: Mostra mensagem "Desabilitado neste ambiente"
-
----
-
-#### 📋 Matriz de Diferenças
-
-| Aspecto | COM Verificação (true) | SEM Verificação (false) |
-|--------|---|---|
-| **Ambiente** | Dev local, Staging, Produção | Demonstração pública |
-| **Cadastro** | `is_verified: false` | `is_verified: true` |
-| **Email** | Enviado | NÃO enviado |
-| **Resposta POST /v1/user** | `{ user, message }` | `{ user }` |
-| **Login antes de verificar** | ❌ Bloqueado (401) | ✅ Permitido |
-| **Login após verificar** | ✅ Permitido | N/A (já verificado) |
-| **Endpoint `/verify-email`** | Valida token | Mostra "desabilitado" |
-| **Frontend detecta** | `!!response.message === true` | `!!response.message === false` |
-
----
-
-#### 🧪 Testando Ambos os Modos
-
-**Modo 1: Verificação HABILITADA (true)**
-
-```bash
-# Terminal 1: Setar variável
-export EMAIL_VERIFICATION_ENABLED=true
-
-# Terminal 2: Iniciar backend
-npm run start:dev
-
-# Terminal 3: Testar cadastro
-curl -X POST http://localhost:3000/v1/user \
-  -H "Content-Type: application/json" \
-  -d '{
-    "firstname":"João",
-    "email":"joao@test.com",
-    "password":"123456"
-  }'
-
-# Resultado esperado:
-# Status: 201
-# Response: { user: {...}, message: "Email enviado..." }
-
-# Pode logar?
-curl -X POST http://localhost:3000/v1/user/login \
-  -d '{"email":"joao@test.com","password":"123456"}'
-
-# Resultado: 401 (precisa verificar email)
-```
-
-**Modo 2: Verificação DESABILITADA (false)**
-
-```bash
-# Terminal 1: Setar variável
-export EMAIL_VERIFICATION_ENABLED=false
-
-# Terminal 2: Iniciar backend
-npm run start:dev
-
-# Terminal 3: Testar cadastro
-curl -X POST http://localhost:3000/v1/user \
-  -H "Content-Type: application/json" \
-  -d '{
-    "firstname":"João",
-    "email":"joao@test.com",
-    "password":"123456"
-  }'
-
-# Resultado esperado:
-# Status: 201
-# Response: { user: {...} } (SEM message!)
-
-# Pode logar?
-curl -X POST http://localhost:3000/v1/user/login \
-  -d '{"email":"joao@test.com","password":"123456"}'
-
-# Resultado: 200 OK + token (login permitido!)
-```
-
----
-
-#### 🚀 Deploy na Vercel
-
-**Configurar variável de ambiente:**
-
-1. Acesse Dashboard da Vercel → Seu Projeto
-2. Settings → Environment Variables
-3. Adicione:
-   - Name: `EMAIL_VERIFICATION_ENABLED`
-   - Value: `false` (para demonstração)
-   - Select Environment: `Production`
-4. Redeploy do projeto
-
-**Resultado:** Todos que acessarem sua aplicação na Vercel será demo mode (sem email).
-
----
-
-#### 🔐 Segurança
-
-✅ **Em Produção (true):**
-- Verificação de email obrigatória
-- Usuários não conseguem logar sem validar email
-- Garante proprietários de email legítimos
-
-✅ **Em Demonstração (false):**
-- Apenas para ambientes não-produtivos
-- Nunca use `false` com dados sensíveis reais
-- Ideal para avaliadores que não têm acesso ao email da empresa
-
----
-
-#### 📚 Documentação Relacionada
-
-- Backend Implementation: `BACKEND_UPDATE_EMAIL_DETECTION.md`
-- Frontend Integration: `FRONTEND_INTEGRATION_NOTES.md` (no repo frontend)
-- Code Comments: Veja JSDoc em `CreateUserService`, `CreateUserResponseDto`, `CreateUserController`
 
 ---
 
