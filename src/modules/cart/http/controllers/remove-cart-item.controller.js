@@ -1,31 +1,8 @@
 const RemoveCartItemService = require("../../core/services/remove-cart-item.service");
 
 /**
- * @swagger
- * /v1/cart/remove/{itemId}:
- *   delete:
- *     summary: Remove um item do carrinho
- *     description: Remove um item específico do carrinho do usuário autenticado.
- *     tags:
- *       - Carrinho
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: itemId
- *         required: true
- *         schema:
- *           type: string
- *         description: ID do item do carrinho a ser removido
- *     responses:
- *       204:
- *         description: Item removido com sucesso
- *       401:
- *         description: Não autenticado
- *       403:
- *         description: Acesso negado (o item não pertence ao usuário)
- *       404:
- *         description: Item não encontrado
+ * Controller responsável por remover um item do carrinho.
+ * Extrai o userId do token JWT e delega ao serviço.
  */
 class RemoveCartItemController {
   /**

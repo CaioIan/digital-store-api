@@ -2,20 +2,8 @@ const ListCartService = require("../../core/services/list-cart.service");
 const ListCartResponseDto = require("../dto/response/list-cart.response.dto");
 
 /**
- * @swagger
- * /v1/cart:
- *   get:
- *     summary: Lista os itens do carrinho
- *     description: Retorna todos os itens presentes no carrinho do usuário autenticado.
- *     tags:
- *       - Carrinho
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Carrinho retornado com sucesso
- *       401:
- *         description: Não autenticado
+ * Controller responsável pela listagem do carrinho.
+ * Extrai o userId do token JWT e delega ao serviço.
  */
 class ListCartController {
   /**

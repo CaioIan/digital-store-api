@@ -5,18 +5,19 @@ const { User, UserAddress, sequelize } = require("../../../models");
  * Realiza interações diretas com o banco de dados, sem lógica de negócio.
  */
 class UserRepository {
-   /**
-   * Cria um novo registro de usuário no banco de dados.
-   * Por segurança, a `role` é sempre forçada para 'USER' para evitar escalação de privilégios.
-   * @param {Object} userData - Objeto contendo os dados básicos do usuário.
-   * @param {string} userData.firstname - Primeiro nome.
-   * @param {string} userData.surname - Sobrenome.
-   * @param {string} userData.cpf - CPF único.
-   * @param {string} userData.phone - Telefone único.
-   * @param {string} userData.email - E-mail único.
-   * @param {string} userData.password - Senha em texto plano (será hasheada pelo model).
-   * @param {Object|null} addressData - Opcional. Dados para criação de endereço vinculado.
-   * @returns {Promise<Object>} Instância do usuário criado com seus endereços incluídos.
+  /**
+   * Cria um novo usuário com a role forçada para 'USER'.
+   * Se dados de endereço forem fornecidos, cria o endereço na mesma transação.
+   * O campo role nunca é aceito de entrada externa para prevenir escalação de privilégios.
+   * @param {Object} userData - Dados do usuário a ser criado.
+   * @param {string} userData.firstname - Primeiro nome do usuário.
+   * @param {string} userData.surname - Sobrenome do usuário.
+   * @param {string} userData.cpf - CPF do usuário.
+   * @param {string} userData.phone - Telefone do usuário.
+   * @param {string} userData.email - Endereço de e-mail do usuário.
+   * @param {string} userData.password - Senha do usuário (será hasheada pelo model).
+   * @param {Object|null} addressData - Dados de endereço de entrega (opcional).
+   * @returns {Promise<Object>} O registro do usuário criado com endereços incluídos.
    */
   async create({ firstname, surname, cpf, phone, email, password }, addressData = null) {
     const result = await sequelize.transaction(async (t) => {
@@ -56,10 +57,9 @@ class UserRepository {
   }
 
   /**
-   * Localiza um usuário pelo seu endereço de e-mail.
-   * Filtra automaticamente registros que sofreram soft-delete.
-   * @param {string} email - E-mail a ser pesquisado.
-   * @returns {Promise<Object|null>} Instância do usuário ou null.
+   * Busca um usuário pelo endereço de e-mail, excluindo registros com soft-delete.
+   * @param {string} email - Endereço de e-mail a ser pesquisado.
+   * @returns {Promise<Object|null>} O registro do usuário ou null se não encontrado.
    */
   async findByEmail(email) {
     const user = await User.findOne({
@@ -72,12 +72,7 @@ class UserRepository {
   }
 
   /**
-   * Verifica a existência de usuários com conflito de dados únicos (E-mail, CPF ou Telefone).
-   * Utilizado durante o cadastro para validar unicidade.
-   * @param {string} email - E-mail para verificar.
-   * @param {string} cpf - CPF para verificar.
-   * @param {string} phone - Telefone para verificar.
-   * @returns {Promise<Array<Object>>} Lista de usuários que possuem algum dos dados informados.
+   * Busca usuários que já possem o mesmo e-mail, cpf ou telefone.
    */
   async findConflictingUsers(email, cpf, phone) {
     const { Op } = require("sequelize");

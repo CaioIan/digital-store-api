@@ -1,43 +1,8 @@
 const UpdateCartItemService = require("../../core/services/update-cart-item.service");
 
 /**
- * @swagger
- * /v1/cart/update/{itemId}:
- *   put:
- *     summary: Atualiza a quantidade de um item no carrinho
- *     description: Altera a quantidade de um item específico no carrinho do usuário autenticado.
- *     tags:
- *       - Carrinho
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: itemId
- *         required: true
- *         schema:
- *           type: string
- *         description: ID do item do carrinho
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - quantity
- *             properties:
- *               quantity:
- *                 type: integer
- *                 example: 2
- *     responses:
- *       200:
- *         description: Quantidade atualizada com sucesso
- *       401:
- *         description: Não autenticado
- *       403:
- *         description: Acesso negado
- *       404:
- *         description: Item não encontrado
+ * Controller responsável por atualizar a quantidade de um item no carrinho.
+ * Extrai o userId do token JWT e delega ao serviço.
  */
 class UpdateCartItemController {
   /**

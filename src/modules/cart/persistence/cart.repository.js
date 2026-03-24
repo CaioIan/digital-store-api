@@ -6,10 +6,9 @@ const { Cart, CartItem, Product, ProductImage } = require("../../../models");
  */
 class CartRepository {
   /**
-   * Busca um registro de Carrinho (Cart) pelo usuário ou cria um novo caso não exista.
-   * Útil para garantir que o usuário sempre tenha um carrinho ativo para operações de Checkout.
-   * @param {string} userId - UUID do usuário dono do carrinho.
-   * @returns {Promise<import('sequelize').Model>} Instância do modelo Cart.
+   * Busca ou cria o carrinho do usuário.
+   * @param {string} userId - UUID do usuário autenticado.
+   * @returns {Promise<import('sequelize').Model>} Instância do Cart.
    */
   async findOrCreateCart(userId) {
     const [cart] = await Cart.findOrCreate({
@@ -51,13 +50,12 @@ class CartRepository {
   }
 
   /**
-   * Busca um item específico dentro do carrinho pela combinação de atributos.
-   * Permite identificar duplicatas de produtos com mesma cor e tamanho.
-   * @param {string} cartId - UUID do carrinho (Cart).
-   * @param {number} productId - ID numérico do produto (Product).
-   * @param {string|null} selectedColor - Nome da cor selecionada ou null.
-   * @param {string|null} selectedSize - Identificador do tamanho selecionado ou null.
-   * @returns {Promise<import('sequelize').Model|null>} Instância do CartItem ou null.
+   * Busca um item no carrinho pela combinação exata de produto, cor e tamanho.
+   * @param {string} cartId - UUID do carrinho.
+   * @param {number} productId - ID do produto.
+   * @param {string|null} selectedColor - Cor selecionada.
+   * @param {string|null} selectedSize - Tamanho selecionado.
+   * @returns {Promise<import('sequelize').Model|null>} CartItem encontrado ou null.
    */
   async findCartItem(cartId, productId, selectedColor, selectedSize) {
     return CartItem.findOne({
@@ -99,10 +97,9 @@ class CartRepository {
   }
 
   /**
-   * Busca um item de carrinho (CartItem) pelo seu ID único.
-   * Inclui a associação com o Carrinho (Cart) pai para validações de permissão.
-   * @param {string} itemId - UUID do registro do item no carrinho.
-   * @returns {Promise<import('sequelize').Model|null>} Instância do CartItem com Cart incluído, ou null.
+   * Busca um CartItem pelo ID com o Cart associado (para validação de ownership).
+   * @param {string} itemId - UUID do CartItem.
+   * @returns {Promise<import('sequelize').Model|null>} CartItem com Cart incluído, ou null.
    */
   async findItemById(itemId) {
     return CartItem.findByPk(itemId, {
