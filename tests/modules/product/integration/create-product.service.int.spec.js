@@ -1,6 +1,5 @@
 const request = require("supertest");
 const express = require("express");
-const cookieParser = require("cookie-parser");
 const { generateToken } = require("../../../../src/shared/auth/jwt");
 const { Product, Category, ProductImage, ProductOption, sequelize } = require("../../../../src/models");
 const productRoutes = require("../../../../src/modules/product/routes/product.routes");
@@ -8,7 +7,6 @@ const productRoutes = require("../../../../src/modules/product/routes/product.ro
 // Setup da aplicação Express para o teste
 const app = express();
 app.use(express.json());
-app.use(cookieParser());
 app.use(productRoutes);
 const errorHandler = require("../../../../src/shared/middlewares/error-handler.middleware");
 app.use(errorHandler);
@@ -95,7 +93,7 @@ describe("Create Product - Integration Tests", () => {
     const token = generateToken(adminPayload);
     const payload = { ...validProductComplete, category_ids: [testCategory.id] };
 
-    const response = await request(app).post("/v1/product").set("Cookie", `access_token=${token}`).send(payload);
+    const response = await request(app).post("/v1/product").set("Authorization", `Bearer ${token}`).send(payload);
 
     expect(response.status).toBe(201);
     expect(response.body).toHaveProperty("id");
@@ -114,7 +112,7 @@ describe("Create Product - Integration Tests", () => {
 
     const response = await request(app)
       .post("/v1/product")
-      .set("Cookie", `access_token=${token}`)
+      .set("Authorization", `Bearer ${token}`)
       .send(validProductMinimal);
 
     expect(response.status).toBe(201);
@@ -139,7 +137,7 @@ describe("Create Product - Integration Tests", () => {
     const token = generateToken(adminPayload);
     const invalidData = { slug: "test", price: 100 };
 
-    const response = await request(app).post("/v1/product").set("Cookie", `access_token=${token}`).send(invalidData);
+    const response = await request(app).post("/v1/product").set("Authorization", `Bearer ${token}`).send(invalidData);
 
     expect(response.status).toBe(400);
     expect(response.body.errors).toEqual(expect.arrayContaining([expect.objectContaining({ field: "name" })]));
@@ -149,7 +147,7 @@ describe("Create Product - Integration Tests", () => {
     const token = generateToken(adminPayload);
     const invalidData = { name: "Test", slug: "test" };
 
-    const response = await request(app).post("/v1/product").set("Cookie", `access_token=${token}`).send(invalidData);
+    const response = await request(app).post("/v1/product").set("Authorization", `Bearer ${token}`).send(invalidData);
 
     expect(response.status).toBe(400);
     expect(response.body.errors).toEqual(expect.arrayContaining([expect.objectContaining({ field: "price" })]));
@@ -161,7 +159,7 @@ describe("Create Product - Integration Tests", () => {
     const token = generateToken(userPayload);
     const payload = { ...validProductComplete, category_ids: [testCategory.id] };
 
-    const response = await request(app).post("/v1/product").set("Cookie", `access_token=${token}`).send(payload);
+    const response = await request(app).post("/v1/product").set("Authorization", `Bearer ${token}`).send(payload);
 
     expect(response.status).toBe(403);
     expect(response.body).toHaveProperty("error");
@@ -183,7 +181,7 @@ describe("Create Product - Integration Tests", () => {
     const token = generateToken(adminPayload);
     const invalidData = { slug: "test", price: 100, price_with_discount: 90 };
 
-    const response = await request(app).post("/v1/product").set("Cookie", `access_token=${token}`).send(invalidData);
+    const response = await request(app).post("/v1/product").set("Authorization", `Bearer ${token}`).send(invalidData);
 
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty("errors");
@@ -194,7 +192,7 @@ describe("Create Product - Integration Tests", () => {
     const token = generateToken(adminPayload);
     const invalidData = { ...validProductComplete, stock: -5, category_ids: [testCategory.id] };
 
-    const response = await request(app).post("/v1/product").set("Cookie", `access_token=${token}`).send(invalidData);
+    const response = await request(app).post("/v1/product").set("Authorization", `Bearer ${token}`).send(invalidData);
 
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty("errors");
@@ -214,7 +212,7 @@ describe("Create Product - Integration Tests", () => {
       category_ids: [testCategory.id],
     };
 
-    const response = await request(app).post("/v1/product").set("Cookie", `access_token=${token}`).send(invalidData);
+    const response = await request(app).post("/v1/product").set("Authorization", `Bearer ${token}`).send(invalidData);
 
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty("errors");
@@ -228,10 +226,10 @@ describe("Create Product - Integration Tests", () => {
     const payload = { ...validProductComplete, category_ids: [testCategory.id] };
 
     // Cria o primeiro produto
-    await request(app).post("/v1/product").set("Cookie", `access_token=${token}`).send(payload);
+    await request(app).post("/v1/product").set("Authorization", `Bearer ${token}`).send(payload);
 
     // Tenta criar o segundo com mesmo slug
-    const response = await request(app).post("/v1/product").set("Cookie", `access_token=${token}`).send(payload);
+    const response = await request(app).post("/v1/product").set("Authorization", `Bearer ${token}`).send(payload);
 
     expect(response.status).toBe(400);
     expect(response.body.message).toMatch(/já existe/i);
@@ -242,13 +240,13 @@ describe("Create Product - Integration Tests", () => {
     const payload = { ...validProductComplete, category_ids: [testCategory.id] };
 
     // Cria o primeiro produto
-    await request(app).post("/v1/product").set("Cookie", `access_token=${token}`).send(payload);
+    await request(app).post("/v1/product").set("Authorization", `Bearer ${token}`).send(payload);
 
     // Tenta criar o segundo com mesmo nome (mesmo que slug mude)
     const duplicateNameData = { ...payload, slug: "outro-slug" };
     const response = await request(app)
       .post("/v1/product")
-      .set("Cookie", `access_token=${token}`)
+      .set("Authorization", `Bearer ${token}`)
       .send(duplicateNameData);
 
     expect(response.status).toBe(400);
@@ -259,7 +257,7 @@ describe("Create Product - Integration Tests", () => {
     const token = generateToken(adminPayload);
     const invalidData = { ...validProductComplete, category_ids: ["00000000-0000-0000-0000-000000000000"] };
 
-    const response = await request(app).post("/v1/product").set("Cookie", `access_token=${token}`).send(invalidData);
+    const response = await request(app).post("/v1/product").set("Authorization", `Bearer ${token}`).send(invalidData);
 
     expect(response.status).toBe(400);
     expect(response.body.message).toMatch(/não encontradas/i);
@@ -269,7 +267,7 @@ describe("Create Product - Integration Tests", () => {
     const token = generateToken(adminPayload);
     const invalidData = { ...validProductComplete, category_ids: ["not-a-uuid"] };
 
-    const response = await request(app).post("/v1/product").set("Cookie", `access_token=${token}`).send(invalidData);
+    const response = await request(app).post("/v1/product").set("Authorization", `Bearer ${token}`).send(invalidData);
 
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty("errors");
@@ -288,7 +286,7 @@ describe("Create Product - Integration Tests", () => {
       ],
     };
 
-    const response = await request(app).post("/v1/product").set("Cookie", `access_token=${token}`).send(invalidData);
+    const response = await request(app).post("/v1/product").set("Authorization", `Bearer ${token}`).send(invalidData);
 
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty("errors");
@@ -312,7 +310,7 @@ describe("Create Product - Integration Tests", () => {
       role: "SUPERUSER",
     };
 
-    const response = await request(app).post("/v1/product").set("Cookie", `access_token=${token}`).send(maliciousData);
+    const response = await request(app).post("/v1/product").set("Authorization", `Bearer ${token}`).send(maliciousData);
 
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty("errors");
@@ -326,7 +324,7 @@ describe("Create Product - Integration Tests", () => {
       options: [{ title: "Test", shape: "triangle", type: "text", values: ["A"] }],
     };
 
-    const response = await request(app).post("/v1/product").set("Cookie", `access_token=${token}`).send(invalidData);
+    const response = await request(app).post("/v1/product").set("Authorization", `Bearer ${token}`).send(invalidData);
 
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty("errors");
@@ -356,7 +354,7 @@ describe("Create Product - Integration Tests", () => {
       ],
     };
 
-    const response = await request(app).post("/v1/product").set("Cookie", `access_token=${token}`).send(invalidData);
+    const response = await request(app).post("/v1/product").set("Authorization", `Bearer ${token}`).send(invalidData);
 
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty("errors");

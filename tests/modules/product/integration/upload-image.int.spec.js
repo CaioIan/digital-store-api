@@ -21,14 +21,12 @@ jest.mock("../../../../src/config/cloudinary.config", () => ({
 
 const request = require("supertest");
 const express = require("express");
-const cookieParser = require("cookie-parser");
 const { generateToken } = require("../../../../src/shared/auth/jwt");
 const productRoutes = require("../../../../src/modules/product/routes/product.routes");
 
 // Setup da aplicação Express para o teste
 const app = express();
 app.use(express.json());
-app.use(cookieParser());
 app.use(productRoutes);
 const errorHandler = require("../../../../src/shared/middlewares/error-handler.middleware");
 app.use(errorHandler);
@@ -52,7 +50,7 @@ describe("Upload Image - Integration Tests", () => {
 
     const response = await request(app)
       .post("/v1/product/upload-image")
-      .set("Cookie", `access_token=${token}`)
+      .set("Authorization", `Bearer ${token}`)
       .send(payload);
 
     expect(response.status).toBe(200);
@@ -74,7 +72,7 @@ describe("Upload Image - Integration Tests", () => {
 
     const response = await request(app)
       .post("/v1/product/upload-image")
-      .set("Cookie", `access_token=${token}`)
+      .set("Authorization", `Bearer ${token}`)
       .send(payload);
 
     expect(response.status).toBe(403);
@@ -102,7 +100,7 @@ describe("Upload Image - Integration Tests", () => {
 
     const response = await request(app)
       .post("/v1/product/upload-image")
-      .set("Cookie", `access_token=${token}`)
+      .set("Authorization", `Bearer ${token}`)
       .send(payload);
 
     expect(response.status).toBe(400);
@@ -118,7 +116,7 @@ describe("Upload Image - Integration Tests", () => {
 
     const response = await request(app)
       .post("/v1/product/upload-image")
-      .set("Cookie", `access_token=${token}`)
+      .set("Authorization", `Bearer ${token}`)
       .send(payload);
 
     expect(response.status).toBe(400);
@@ -135,7 +133,7 @@ describe("Upload Image - Integration Tests", () => {
 
     const response = await request(app)
       .post("/v1/product/upload-image")
-      .set("Cookie", `access_token=${token}`)
+      .set("Authorization", `Bearer ${token}`)
       .send(payload);
 
     expect(response.status).toBe(400);
@@ -159,7 +157,7 @@ describe("Upload Image - Integration Tests", () => {
 
     const response = await request(app)
       .post("/v1/product/upload-image")
-      .set("Cookie", `access_token=${token}`)
+      .set("Authorization", `Bearer ${token}`)
       .send(payload);
 
     expect(response.status).toBe(400);
@@ -179,7 +177,7 @@ describe("Upload Image - Integration Tests", () => {
 
     const response = await request(app)
       .post("/v1/product/upload-image")
-      .set("Cookie", `access_token=${token}`)
+      .set("Authorization", `Bearer ${token}`)
       .send({});
 
     expect(response.status).toBe(400);

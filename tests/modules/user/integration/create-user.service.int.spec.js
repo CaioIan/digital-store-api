@@ -1,9 +1,5 @@
 // Testes de integração para create-user.service.js
 
-jest.mock("../../../../src/shared/providers/email/email.provider", () => ({
-  sendVerificationEmail: jest.fn().mockResolvedValue(true),
-}));
-
 const createUserService = require("../../../../src/modules/user/core/services/create-user.service");
 const { setupTestDatabase, clearTestDatabase, User } = require("../../../helpers/test-database.helper");
 
@@ -80,7 +76,6 @@ describe("CreateUserService - Integration Tests", () => {
     it("deve lançar erro quando o email já está cadastrado", async () => {
       // Cria o primeiro usuário
       await createUserService.execute(validUserData);
-      await User.update({ is_verified: true }, { where: { email: validUserData.email } });
 
       // Tenta criar outro usuário com o mesmo email
       const duplicateUser = {
@@ -88,7 +83,7 @@ describe("CreateUserService - Integration Tests", () => {
         firstname: "Jane",
       };
 
-      await expect(createUserService.execute(duplicateUser)).rejects.toThrow("Este usuário (e-mail) já está cadastrado.");
+      await expect(createUserService.execute(duplicateUser)).rejects.toThrow("Este usuário já está cadastrado.");
 
       // Verifica que só existe um usuário com esse email
       const usersCount = await User.count({ where: { email: validUserData.email } });
