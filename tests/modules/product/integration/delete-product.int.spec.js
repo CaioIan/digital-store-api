@@ -82,7 +82,7 @@ describe("Delete Product Integration Test", () => {
   it("deve deletar um produto com sucesso quando autenticado como ADMIN", async () => {
     const response = await request(app)
       .delete(`/v1/product/${createdProduct.id}`)
-      .set("Cookie", `access_token=${adminToken}`);
+      .set("Authorization", `Bearer ${adminToken}`);
 
     expect(response.status).toBe(204);
 
@@ -95,7 +95,7 @@ describe("Delete Product Integration Test", () => {
     const nonExistentId = 99999;
     const response = await request(app)
       .delete(`/v1/product/${nonExistentId}`)
-      .set("Cookie", `access_token=${adminToken}`);
+      .set("Authorization", `Bearer ${adminToken}`);
 
     expect(response.status).toBe(404);
     expect(response.body).toHaveProperty("message", "Recurso não encontrado.");
@@ -110,13 +110,13 @@ describe("Delete Product Integration Test", () => {
   it("deve retornar 403 ao tentar deletar como usuário não-ADMIN", async () => {
     const response = await request(app)
       .delete(`/v1/product/${createdProduct.id}`)
-      .set("Cookie", `access_token=${userToken}`);
+      .set("Authorization", `Bearer ${userToken}`);
 
     expect(response.status).toBe(403);
   });
 
   it("deve retornar 400 quando o ID for inválido", async () => {
-    const response = await request(app).delete(`/v1/product/invalid-id`).set("Cookie", `access_token=${adminToken}`);
+    const response = await request(app).delete(`/v1/product/invalid-id`).set("Authorization", `Bearer ${adminToken}`);
 
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty("errors");

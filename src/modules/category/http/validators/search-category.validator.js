@@ -37,7 +37,7 @@ const searchCategorySchema = z.object({
 
 /**
  * Middleware Express que valida os query params contra o searchCategorySchema.
- * Os dados validados e transformados são armazenados em res.locals antes de continuar.
+ * Os dados validados e transformados são reescritos em req.query antes de continuar.
  * Retorna 400 com erros por campo se a validação falhar.
  * @param {import('express').Request} req - Objeto de requisição do Express.
  * @param {import('express').Response} res - Objeto de resposta do Express.
@@ -54,7 +54,7 @@ const searchCategoryValidator = (req, res, next) => {
     return res.status(400).json({ errors });
   }
 
-  res.locals.searchCategoryParams = result.data;
+  req.query = result.data;
   next();
 };
 

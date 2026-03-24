@@ -1,13 +1,11 @@
 const request = require("supertest");
 const express = require("express");
-const cookieParser = require("cookie-parser");
 const { generateToken } = require("../../../../src/shared/auth/jwt");
 const { Category, sequelize } = require("../../../../src/models");
 const categoryRoutes = require("../../../../src/modules/category/routes/category.routes");
 
 const app = express();
 app.use(express.json());
-app.use(cookieParser());
 app.use(categoryRoutes);
 const errorHandler = require("../../../../src/shared/middlewares/error-handler.middleware");
 app.use(errorHandler);
@@ -63,7 +61,7 @@ describe("Update Category - Integration Tests", () => {
 
     const response = await request(app)
       .patch(`/v1/category/${category.id}`)
-      .set("Cookie", `access_token=${token}`)
+      .set("Authorization", `Bearer ${token}`)
       .send(validUpdateData);
 
     expect(response.status).toBe(200);
@@ -84,7 +82,7 @@ describe("Update Category - Integration Tests", () => {
 
     const response = await request(app)
       .patch(`/v1/category/${category.id}`)
-      .set("Cookie", `access_token=${token}`)
+      .set("Authorization", `Bearer ${token}`)
       .send(validUpdateData);
 
     expect(response.status).toBe(403);
@@ -109,7 +107,7 @@ describe("Update Category - Integration Tests", () => {
 
     const response = await request(app)
       .patch(`/v1/category/${category.id}`)
-      .set("Cookie", `access_token=${token}`)
+      .set("Authorization", `Bearer ${token}`)
       .send({}); // Body vazio
 
     expect(response.status).toBe(400);
@@ -123,7 +121,7 @@ describe("Update Category - Integration Tests", () => {
 
     const response = await request(app)
       .patch(`/v1/category/${category.id}`)
-      .set("Cookie", `access_token=${token}`)
+      .set("Authorization", `Bearer ${token}`)
       .send({ name: "A", slug: "B", use_in_menu: true }); // name e slug com menos de 2 chars
 
     expect(response.status).toBe(400);
@@ -136,7 +134,7 @@ describe("Update Category - Integration Tests", () => {
 
     const response = await request(app)
       .patch(`/v1/category/${category.id}`)
-      .set("Cookie", `access_token=${token}`)
+      .set("Authorization", `Bearer ${token}`)
       .send({ ...validUpdateData, extra_field: "hack" }); // Campo extra rejeitado pelo .strict()
 
     expect(response.status).toBe(400);
@@ -149,7 +147,7 @@ describe("Update Category - Integration Tests", () => {
 
     const response = await request(app)
       .patch(`/v1/category/${fakeId}`)
-      .set("Cookie", `access_token=${token}`)
+      .set("Authorization", `Bearer ${token}`)
       .send(validUpdateData);
 
     expect(response.status).toBe(404);
@@ -163,7 +161,7 @@ describe("Update Category - Integration Tests", () => {
 
     const response = await request(app)
       .patch(`/v1/category/${category.id}`)
-      .set("Cookie", `access_token=${token}`)
+      .set("Authorization", `Bearer ${token}`)
       .send({ ...validUpdateData, name: longString, slug: longString });
 
     expect(response.status).toBe(400);

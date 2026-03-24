@@ -1,6 +1,5 @@
 const request = require("supertest");
 const express = require("express");
-const cookieParser = require("cookie-parser");
 const { generateToken } = require("../../../../src/shared/auth/jwt");
 const { Category, sequelize } = require("../../../../src/models");
 const categoryRoutes = require("../../../../src/modules/category/routes/category.routes");
@@ -8,7 +7,6 @@ const categoryRoutes = require("../../../../src/modules/category/routes/category
 // Setup da aplicação Express para o teste
 const app = express();
 app.use(express.json());
-app.use(cookieParser());
 app.use(categoryRoutes);
 
 const errorHandler = require("../../../../src/shared/middlewares/error-handler.middleware");
@@ -57,7 +55,7 @@ describe("Create Category - Integration Tests", () => {
 
     const response = await request(app)
       .post("/v1/category")
-      .set("Cookie", `access_token=${token}`)
+      .set("Authorization", `Bearer ${token}`)
       .send(validCategory);
 
     expect(response.status).toBe(201);
@@ -76,7 +74,7 @@ describe("Create Category - Integration Tests", () => {
 
     const response = await request(app)
       .post("/v1/category")
-      .set("Cookie", `access_token=${token}`)
+      .set("Authorization", `Bearer ${token}`)
       .send(validCategory);
 
     expect(response.status).toBe(403);
@@ -99,7 +97,7 @@ describe("Create Category - Integration Tests", () => {
       // slug faltando
     };
 
-    const response = await request(app).post("/v1/category").set("Cookie", `access_token=${token}`).send(invalidData);
+    const response = await request(app).post("/v1/category").set("Authorization", `Bearer ${token}`).send(invalidData);
 
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty("errors");
@@ -114,7 +112,7 @@ describe("Create Category - Integration Tests", () => {
     // Tenta criar novamente com os mesmos dados
     const response = await request(app)
       .post("/v1/category")
-      .set("Cookie", `access_token=${token}`)
+      .set("Authorization", `Bearer ${token}`)
       .send(validCategory);
 
     expect(response.status).toBe(400);
@@ -131,7 +129,7 @@ describe("Create Category - Integration Tests", () => {
       use_in_menu: true,
     };
 
-    const response = await request(app).post("/v1/category").set("Cookie", `access_token=${token}`).send(invalidData);
+    const response = await request(app).post("/v1/category").set("Authorization", `Bearer ${token}`).send(invalidData);
 
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty("errors");
