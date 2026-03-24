@@ -1,11 +1,18 @@
-const { Resend } = require("resend");
+const nodemailer = require("nodemailer");
 
 /**
- * Provider responsável por configuração e disparo de emails via Resend.
+ * Provider responsável por configuração e disparo de emails.
  */
 class EmailProvider {
   constructor() {
-    this.resend = new Resend(process.env.RESEND_API_KEY || process.env.SMTP_PASS);
+    this.transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST || "smtp.ethereal.email",
+      port: process.env.SMTP_PORT || 587,
+      auth: {
+        user: process.env.SMTP_USER || "ethereal.user@ethereal.email",
+        pass: process.env.SMTP_PASS || "fake_password",
+      },
+    });
   }
 
   async sendVerificationEmail(to, token) {
@@ -13,18 +20,12 @@ class EmailProvider {
     const template = require("./templates/verification")(verificationUrl);
 
     try {
-      const { data, error } = await this.resend.emails.send({
-        from: process.env.MAIL_FROM || "Digital Store <onboarding@resend.dev>",
-        to: [to],
+      await this.transporter.sendMail({
+        from: '"Digital Store" <no-reply@digitalstore.com>',
+        to,
         subject: "Verifique seu email - Digital Store",
         html: template,
       });
-
-      if (error) {
-        console.error("[EmailProvider] Erro do Resend ao enviar email:", error);
-        throw new Error(error.message);
-      }
-
       return true;
     } catch (error) {
       console.error("[EmailProvider] Erro ao enviar email de verificação:", error);
