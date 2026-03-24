@@ -16,6 +16,7 @@ const optionSchema = z
     shape: z.enum(["square", "circle"]).optional(),
     radius: z.number().int().optional(),
     type: z.enum(["text", "color"]).optional(),
+    category_id: z.uuid("category_id da opção deve ser um UUID válido").optional(),
     values: z.array(z.string().max(255, "Valor da opção deve ter no máximo 255 caracteres")).optional(),
   })
   .transform((data) => {

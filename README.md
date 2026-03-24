@@ -48,7 +48,7 @@ O projeto **Digital Store** é composto por **3 repositórios independentes** qu
 └──────────────────────┘         └──────────────────┘         └──────────────────────┘
 ```
 
-> O **Front-end do Cliente** consome a mesma API que o **Painel Admin**, porém com permissões e endpoints diferentes. A autenticação é feita via **HTTP-Only Cookies**, garantindo segurança contra ataques XSS.
+> O **Front-end do Cliente** consome a mesma API que o **Painel Admin**, porém com permissões e endpoints diferentes. A autenticação é feita via **HTTP-Only Cookies**, garantindo segurança contra ataques XSS. Para acesso ao painel administrativo, o login deve ser feito pela rota **`POST /v1/admin/login`**.
 
 ---
 
@@ -246,7 +246,32 @@ OK
   }
 }
 ```
-- **Erros:** `400 Bad Request` (Email/Senha inválidos) | `404 Not Found` (Usuário não existe).
+- **Erros:** `401 Unauthorized` (Email/Senha inválidos).
+
+#### POST `/v1/admin/login`
+- **Descrição:** Realiza autenticação exclusiva do painel administrativo. Apenas usuários com role `ADMIN` podem iniciar sessão por esta rota.
+- **Autenticação:** Não
+- **Body:**
+```json
+{
+  "email": "admin@example.com",
+  "password": "MinhaSenhaSuperSecreta"
+}
+```
+- **Response 200:**
+```json
+{
+  "user": {
+    "id": "uuid-aqui",
+    "firstname": "Admin",
+    "surname": "User",
+    "email": "admin@example.com",
+    "cpf": "00000000000",
+    "phone": "85999999999"
+  }
+}
+```
+- **Erros:** `401 Unauthorized` (Credenciais inválidas) | `403 Forbidden` (Usuário sem permissão de ADMIN).
 
 #### POST `/v1/user`
 - **Descrição:** Cadastro de um novo Usuário (Role padrão: `USER`).
@@ -431,6 +456,9 @@ OK
   ]
 }
 ```
+- **Regras importantes:**
+  - `category_ids` é obrigatório e deve conter pelo menos 1 UUID válido.
+  - `options[].category_id` é opcional.
 - **Response 201:** Retorna o status `201 Created` e os dados serializados do produto em JSON.
 - **Erros:** `400 Bad Request` | `403 Forbidden` | `409 Conflict` | `404 Not Found` (Categoria não encontrada).
 

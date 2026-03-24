@@ -55,7 +55,7 @@ class ProductRepository {
           radius: option.radius || 0,
           type: option.type || "text",
           values: JSON.stringify(option.values || []),
-          category_id: null,
+          category_id: option.category_id || null,
         }));
         await ProductOption.bulkCreate(optionRecords, { transaction });
       }
@@ -307,7 +307,7 @@ class ProductRepository {
             radius: option.radius || 0,
             type: option.type || "text",
             values: JSON.stringify(option.values || []),
-            category_id: null,
+            category_id: option.category_id || null,
           }));
           await ProductOption.bulkCreate(optionRecords, { transaction });
         }

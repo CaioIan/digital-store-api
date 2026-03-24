@@ -3,6 +3,7 @@ const createUserController = require("../http/controllers/create-user.controller
 const GetUserByIdController = require("../http/controllers/get-user-by-id.controller");
 const GetUserProfileController = require("../http/controllers/get-user-profile.controller");
 const LoginController = require("../http/controllers/login.controller");
+const AdminLoginController = require("../http/controllers/admin-login.controller");
 const UpdateUserController = require("../http/controllers/update-user.controller");
 const UpdateUserAddressController = require("../http/controllers/update-user-address.controller");
 const DeleteUserController = require("../http/controllers/delete-user.controller");
@@ -24,6 +25,7 @@ const { authLimiter, createAccountLimiter } = require("../../../config/rate-limi
  *
  * Rotas públicas:
  * - POST /v1/user/login → Autenticação (loginValidator → LoginController)
+ * - POST /v1/admin/login → Autenticação administrativa (loginValidator → AdminLoginController)
  * - POST /v1/user       → Cadastro (createUserValidator → CreateUserController)
  *
  * Rotas autenticadas (requerem Bearer Token JWT):
@@ -36,6 +38,7 @@ const { authLimiter, createAccountLimiter } = require("../../../config/rate-limi
 const router = express.Router();
 
 router.post("/v1/user/login", authLimiter, loginValidator, asyncHandler(LoginController.handle));
+router.post("/v1/admin/login", authLimiter, loginValidator, asyncHandler(AdminLoginController.handle));
 router.post("/v1/user/logout", asyncHandler(LogoutController.handle));
 router.post("/v1/user", createAccountLimiter, createUserValidator, asyncHandler(createUserController.handle));
 
