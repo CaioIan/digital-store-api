@@ -144,6 +144,27 @@ tests/                  # Suíte de testes (Integração e Unitários organizado
 
 ---
 
+## Variáveis de Ambiente
+
+Crie um arquivo `.env` na raiz do projeto contendo as seguintes variáveis:
+
+| Variável | Obrigatória | Descrição |
+|----------|-------------|-----------|
+| `PORT` | Sim | Porta em que o servidor Express irá rodar (Padrão: 3000) |
+| `NODE_ENV` | Sim | Ambiente de execução (`development`, `test` ou `production`) |
+| `DB_USER` | Sim | Usuário do MySQL (ex: `usuario_app`) |
+| `DB_PASSWORD` | Sim | Senha do banco MySQL (ex: `senha_app`) |
+| `DB_NAME` | Sim | Nome do banco principal (ex: `digital_store_db`) |
+| `DB_HOST` | Sim | IP/Host do banco de dados (ex: `127.0.0.1`) |
+| `DB_PORT` | Não | Porta do banco de dados (Padrão: 3306) |
+| `DB_NAME_TEST`| Sim (em Teste) | Nome do banco dedicado para testes (ex: `digital_store_test`) |
+| `JWT_SECRET` | Sim | Chave criptográfica secreta usada para assinar e verificar tokens JWT |
+| `CLOUDINARY_CLOUD_NAME`| Sim | Nome da Cloud associada à conta no Cloudinary |
+| `CLOUDINARY_API_KEY`| Sim | Chave de API do Cloudinary para uploads de Imagem |
+| `CLOUDINARY_API_SECRET`| Sim | Secret de API do Cloudinary para validação do Upload |
+
+---
+
 ## Instalação
 
 1. Clone o repositório:
@@ -162,28 +183,17 @@ npm install
 docker-compose up -d
 ```
 
-4. Acesse o container do app localmente (se aplicável) e rode as Migrations e Seeds (utilizando Sequelize-CLI se configurado no projeto) ou deixe o `sync()` rodar em desenvolvimento.
+4. Rode as migrations:
+```bash
+npx sequelize db:migrate
+```
 
----
+5. Rode as seeds:
+```bash
+npx sequelize db:seed:all
+```
 
-## Variáveis de Ambiente
-
-Crie um arquivo `.env` na raiz do projeto contendo as seguintes variáveis:
-
-| Variável | Obrigatória | Descrição |
-|----------|-------------|-----------|
-| `PORT` | Não | Porta em que o servidor Express irá rodar (Padrão: 3000) |
-| `NODE_ENV` | Não | Ambiente de execução (`development`, `test`, `production`) |
-| `DB_USER` | Sim | Usuário do MySQL (ex: `usuario_app`) |
-| `DB_PASSWORD` | Sim | Senha do banco MySQL (ex: `senha_app`) |
-| `DB_NAME` | Sim | Nome do banco principal (ex: `digital_store_db`) |
-| `DB_HOST` | Sim | IP/Host do banco de dados (ex: `127.0.0.1`) |
-| `DB_PORT` | Não | Porta do banco de dados (Padrão: 3306) |
-| `DB_NAME_TEST`| Sim (em Teste) | Nome do banco dedicado para testes (ex: `digital_store_test`) |
-| `JWT_SECRET` | Sim | Chave criptográfica secreta usada para assinar e verificar tokens JWT |
-| `CLOUDINARY_CLOUD_NAME`| Sim | Nome da Cloud associada à conta no Cloudinary |
-| `CLOUDINARY_API_KEY`| Sim | Chave de API do Cloudinary para uploads de Imagem |
-| `CLOUDINARY_API_SECRET`| Sim | Secret de API do Cloudinary para validação do Upload |
+6. Acesse o container do app localmente (se aplicável) e rode as Migrations e Seeds (utilizando Sequelize-CLI se configurado no projeto) ou deixe o `sync()` rodar em desenvolvimento.
 
 ---
 
