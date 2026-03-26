@@ -142,26 +142,26 @@ tests/                  # Suíte de testes (Integração e Unitários organizado
 - **Banco de Dados:** MySQL 8.0 rodando localmente (ou via Docker)
 - **Dependências Externas:** Conta no Cloudinary para realizar os uploads de imagens.
 
----
-
 ## Variáveis de Ambiente
 
 Crie um arquivo `.env` na raiz do projeto contendo as seguintes variáveis:
 
 | Variável | Obrigatória | Descrição |
 |----------|-------------|-----------|
-| `PORT` | Sim | Porta em que o servidor Express irá rodar (Padrão: 3000) |
-| `NODE_ENV` | Sim | Ambiente de execução (`development`, `test` ou `production`) |
+| `PORT` | Não | Porta em que o servidor Express irá rodar (Padrão: 3000) |
+| `NODE_ENV` | Não | Ambiente de execução (`development`, `test`, `production`) |
 | `DB_USER` | Sim | Usuário do MySQL (ex: `usuario_app`) |
 | `DB_PASSWORD` | Sim | Senha do banco MySQL (ex: `senha_app`) |
 | `DB_NAME` | Sim | Nome do banco principal (ex: `digital_store_db`) |
 | `DB_HOST` | Sim | IP/Host do banco de dados (ex: `127.0.0.1`) |
 | `DB_PORT` | Não | Porta do banco de dados (Padrão: 3306) |
-| `DB_NAME_TEST`| Sim (em Teste) | Nome do banco dedicado para testes (ex: `digital_store_test`) |
+| `DB_NAME_TEST`| Sim (em Teste) | Nome do banco dedicado para testes (ex: `digital_store_db_test`) |
 | `JWT_SECRET` | Sim | Chave criptográfica secreta usada para assinar e verificar tokens JWT |
 | `CLOUDINARY_CLOUD_NAME`| Sim | Nome da Cloud associada à conta no Cloudinary |
 | `CLOUDINARY_API_KEY`| Sim | Chave de API do Cloudinary para uploads de Imagem |
 | `CLOUDINARY_API_SECRET`| Sim | Secret de API do Cloudinary para validação do Upload |
+
+---
 
 ---
 
@@ -183,17 +183,7 @@ npm install
 docker-compose up -d
 ```
 
-4. Rode as migrations:
-```bash
-npx sequelize db:migrate
-```
-
-5. Rode as seeds:
-```bash
-npx sequelize db:seed:all
-```
-
-6. Acesse o container do app localmente (se aplicável) e rode as Migrations e Seeds (utilizando Sequelize-CLI se configurado no projeto) ou deixe o `sync()` rodar em desenvolvimento.
+4. Acesse o container do app localmente (se aplicável) e rode as Migrations e Seeds (utilizando Sequelize-CLI se configurado no projeto) ou deixe o `sync()` rodar em desenvolvimento.
 
 ---
 
@@ -211,9 +201,28 @@ npx sequelize db:seed:all
 
 ### Ambiente de Desenvolvimento local
 1. Configure as variáveis de ambiente acima.
-2. Inicie os containers Docker de DB: `docker-compose up -d`
-3. Execute o projeto: `npm run start:dev`
-4. Acesse: `http://localhost:3000/api-docs` para abrir a interface nativa do Swagger no Navegador.
+2. Inicie os containers Docker de DB: `docker compose up -d`
+3. Aguarde o MySQL concluir a inicialização (primeira subida pode levar alguns segundos).
+4. Rode as migrations: `npx sequelize db:migrate`
+5. Execute o projeto: `npm run start:dev`
+6. Acesse: `http://localhost:3000/api-docs` para abrir a interface nativa do Swagger no Navegador.
+
+### Troubleshooting (Entrega e Avaliação)
+
+Se ocorrer `ERROR: Connection lost: The server closed the connection.` ao rodar migrations:
+
+1. O banco pode ainda estar na fase de inicialização. Aguarde alguns segundos e rode novamente:
+    - `npx sequelize db:migrate`
+2. Confirme se a senha no `.env` está igual ao Docker Compose:
+    - `DB_PASSWORD=senha_app`
+
+Se o MySQL entrar em loop de restart (dados locais corrompidos):
+
+1. Recrie os volumes locais do projeto:
+    - `docker compose down -v`
+    - `docker compose up -d`
+2. Rode novamente:
+    - `npx sequelize db:migrate`
 
 ---
 
