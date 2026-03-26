@@ -142,6 +142,21 @@ tests/                  # Suíte de testes (Integração e Unitários organizado
 - **Banco de Dados:** MySQL 8.0 rodando localmente (ou via Docker)
 - **Dependências Externas:** Conta no Cloudinary para realizar os uploads de imagens.
 
+---
+
+## Instalação
+
+1. Clone o repositório:
+```bash
+git clone https://github.com/CaioIan/digital-store-api.git
+cd digital-store-api
+```
+
+2. Instale as dependências:
+```bash
+npm install
+```
+
 ## Variáveis de Ambiente
 
 Crie um arquivo `.env` na raiz do projeto contendo as seguintes variáveis:
@@ -161,44 +176,6 @@ Crie um arquivo `.env` na raiz do projeto contendo as seguintes variáveis:
 | `CLOUDINARY_API_KEY`| Sim | Chave de API do Cloudinary para uploads de Imagem |
 | `CLOUDINARY_API_SECRET`| Sim | Secret de API do Cloudinary para validação do Upload |
 
----
-
----
-
-## Instalação
-
-1. Clone o repositório:
-```bash
-git clone https://github.com/CaioIan/digital-store-api.git
-cd digital-store-api
-```
-
-2. Instale as dependências:
-```bash
-npm install
-```
-
-3. Suba o ambiente do banco de dados (via Docker Compose):
-```bash
-docker-compose up -d
-```
-
-4. Acesse o container do app localmente (se aplicável) e rode as Migrations e Seeds (utilizando Sequelize-CLI se configurado no projeto) ou deixe o `sync()` rodar em desenvolvimento.
-
----
-
-## Como Executar a API
-
-### Scripts Disponíveis (`package.json`)
-
-- `npm run start:dev` : Inicia o servidor em modo de desenvolvimento utilizando `nodemon` (recarrega ao salvar arquivos).
-- `npm run test` : Executa toda a suíte de testes (Integração e Unitários) utilizando Jest.
-- `npm run test:watch` : Executa os testes em modo iterativo/observador.
-- `npm run test:coverage` : Executa os testes e gera o relatório detalhado de cobertura de código (Coverage).
-- `npm run test:ci` : Executa testes otimizados para pipelines de Integração Contínua.
-- `npm run format` (e `format:files`) : Formata os arquivos do projeto de maneira padronizada com a ferramenta Biome.
-- `npm run lint` / `npm run check` : Valida regras de código, potenciais erros usando BiomeLinter.
-
 ### Ambiente de Desenvolvimento local
 1. Configure as variáveis de ambiente acima.
 2. Inicie os containers Docker de DB: `docker compose up -d`
@@ -207,7 +184,7 @@ docker-compose up -d
 5. Execute o projeto: `npm run start:dev`
 6. Acesse: `http://localhost:3000/api-docs` para abrir a interface nativa do Swagger no Navegador.
 
-### Troubleshooting (Entrega e Avaliação)
+### Troubleshooting
 
 Se ocorrer `ERROR: Connection lost: The server closed the connection.` ao rodar migrations:
 
@@ -225,6 +202,23 @@ Se o MySQL entrar em loop de restart (dados locais corrompidos):
     - `npx sequelize db:migrate`
 
 ---
+
+- Acesse o container do app localmente (se aplicável) e rode as Migrations e Seeds (utilizando Sequelize-CLI se configurado no projeto) ou deixe o `sync()` rodar em desenvolvimento.
+
+---
+
+## Como Executar a API
+
+### Scripts Disponíveis (`package.json`)
+
+- `npm run start:dev` : Inicia o servidor em modo de desenvolvimento utilizando `nodemon` (recarrega ao salvar arquivos).
+- `npm run test` : Executa toda a suíte de testes (Integração e Unitários) utilizando Jest.
+- `npm run test:watch` : Executa os testes em modo iterativo/observador.
+- `npm run test:coverage` : Executa os testes e gera o relatório detalhado de cobertura de código (Coverage).
+- `npm run test:ci` : Executa testes otimizados para pipelines de Integração Contínua.
+- `npm run format` (e `format:files`) : Formata os arquivos do projeto de maneira padronizada com a ferramenta Biome.
+- `npm run lint` / `npm run check` : Valida regras de código, potenciais erros usando BiomeLinter.
+
 
 ## Documentação da API
 
